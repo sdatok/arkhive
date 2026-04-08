@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "@/types";
 
 interface AdminProductTableProps {
@@ -18,10 +18,28 @@ export default function AdminProductTable({
   const router = useRouter();
   const [archivingId, setArchivingId] = useState<string | null>(null);
   const [savingId, setSavingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
   // Optimistic local status per product id
   const [statusMap, setStatusMap] = useState<StatusMap>(() =>
     Object.fromEntries(products.map((p) => [p.id, p.status]))
   );
+
+  // Sync statusMap when server data refreshes (preserves any in-flight optimistic entries)
+  useEffect(() => {
+    setStatusMap((prev) => {
+      const updated = { ...prev };
+      for (const p of products) {
+        // Only update if we're not currently saving this product
+        updated[p.id] = prev[p.id] ?? p.status;
+      }
+      return updated;
+    });
+  }, [products]);
+
+  function showError(msg: string) {
+    setErrorMsg(msg);
+    setTimeout(() => setErrorMsg(null), 4000);
+  }
 
   async function handleArchive(id: string, name: string) {
     if (!confirm(`Archive "${name}"? It will be hidden from the store but not deleted.`)) return;
@@ -34,7 +52,9 @@ export default function AdminProductTable({
     });
     setArchivingId(null);
     if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
       setStatusMap((prev) => ({ ...prev, [id]: products.find((p) => p.id === id)?.status ?? "DRAFT" }));
+      showError(err.error ?? "Failed to archive — are you still signed in?");
     }
     router.refresh();
   }
@@ -50,8 +70,13 @@ export default function AdminProductTable({
     });
     setSavingId(null);
     if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
       setStatusMap((prev) => ({ ...prev, [id]: previous }));
+      showError(err.error ?? "Failed to update status — are you still signed in?");
+      return;
     }
+    // Commit confirmed value
+    setStatusMap((prev) => ({ ...prev, [id]: status }));
     router.refresh();
   }
 
@@ -72,6 +97,12 @@ export default function AdminProductTable({
   }
 
   return (
+    <div>
+      {errorMsg && (
+        <div className="mb-4 px-4 py-3 bg-red-50 border border-red-200 text-[11px] text-red-600 uppercase tracking-widest">
+          {errorMsg}
+        </div>
+      )}
     <div className="bg-white border border-neutral-200 rounded overflow-hidden">
       <table className="w-full">
         <thead>
@@ -195,6 +226,7 @@ export default function AdminProductTable({
           })}
         </tbody>
       </table>
+    </div>
     </div>
   );
 }

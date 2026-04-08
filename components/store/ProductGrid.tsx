@@ -27,12 +27,14 @@ export default function ProductGrid({
   }
 
   return (
-    <div className={`grid ${gridCols[columns]} gap-px bg-neutral-200`}>
-      {products.map((product) => (
-        <div key={product.id} className="bg-white p-3 md:p-4">
-          <ProductCard product={product} />
-        </div>
-      ))}
+    <div className="px-4">
+      <div className={`grid ${gridCols[columns]} gap-px bg-neutral-200`}>
+        {products.map((product) => (
+          <div key={product.id} className="bg-white p-3 md:p-4">
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

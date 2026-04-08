@@ -3,6 +3,7 @@ import { prisma } from "@/lib/db";
 import ProductGrid from "@/components/store/ProductGrid";
 import SlicedPreview from "@/components/store/SlicedPreview";
 import Reviews from "@/components/store/Reviews";
+import HeroSection from "@/components/store/HeroSection";
 import type { Product } from "@/types";
 
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -30,26 +31,7 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="border-b border-neutral-200">
-        <div className="max-w-[1400px] mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
-          <p className="text-[10px] uppercase tracking-[0.3em] text-neutral-400 mb-5">
-            New Season
-          </p>
-          <h1 className="text-[52px] md:text-[96px] font-black uppercase tracking-[-0.03em] leading-none mb-6">
-            ARKHIVE
-          </h1>
-          <p className="text-[11px] text-neutral-500 uppercase tracking-[0.2em] mb-10">
-            Buy · Sell · Trade
-          </p>
-          <Link
-            href="/shop"
-            className="inline-block border border-black text-black px-10 py-3 text-[11px] uppercase tracking-widest font-medium hover:bg-black hover:text-white transition-colors duration-200"
-          >
-            Shop Now
-          </Link>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* Sliced product preview */}
       {featured.length > 0 && <SlicedPreview products={featured} />}

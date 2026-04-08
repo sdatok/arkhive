@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types";
@@ -10,15 +10,27 @@ interface ProductDetailProps {
 }
 
 export default function ProductDetail({ product }: ProductDetailProps) {
+  const sortedImages = [...product.images].sort(
+    (a, b) => a.displayOrder - b.displayOrder
+  );
+
   const [selectedImage, setSelectedImage] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [sizeError, setSizeError] = useState(false);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
 
-  const sortedImages = [...product.images].sort(
-    (a, b) => a.displayOrder - b.displayOrder
-  );
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setLightboxOpen(false);
+      if (e.key === "ArrowRight") setSelectedImage((i) => Math.min(i + 1, sortedImages.length - 1));
+      if (e.key === "ArrowLeft") setSelectedImage((i) => Math.max(i - 1, 0));
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [lightboxOpen, sortedImages.length]);
 
   function handleAddToCart() {
     if (!selectedSize) {
@@ -76,7 +88,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           )}
 
           {/* Main image */}
-          <div className="relative flex-1 aspect-[3/4] bg-neutral-100">
+          <div
+            className="relative flex-1 aspect-[3/4] bg-neutral-100 cursor-zoom-in"
+            onClick={() => sortedImages[selectedImage] && setLightboxOpen(true)}
+          >
             {sortedImages[selectedImage] ? (
               <Image
                 src={sortedImages[selectedImage].url}
@@ -196,6 +211,64 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </div>
         </div>
       </div>
+
+      {/* Lightbox */}
+      {lightboxOpen && sortedImages[selectedImage] && (
+        <div
+          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
+          onClick={() => setLightboxOpen(false)}
+        >
+          {/* Close */}
+          <button
+            className="absolute top-5 right-6 text-white text-[11px] uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity"
+            onClick={() => setLightboxOpen(false)}
+          >
+            Close
+          </button>
+
+          {/* Prev */}
+          {selectedImage > 0 && (
+            <button
+              className="absolute left-5 top-1/2 -translate-y-1/2 text-white text-[20px] opacity-50 hover:opacity-100 transition-opacity px-4 py-2"
+              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => i - 1); }}
+            >
+              ‹
+            </button>
+          )}
+
+          {/* Image */}
+          <div
+            className="relative w-full h-full max-w-4xl mx-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={sortedImages[selectedImage].url}
+              alt={product.name}
+              fill
+              className="object-contain"
+              sizes="100vw"
+              priority
+            />
+          </div>
+
+          {/* Next */}
+          {selectedImage < sortedImages.length - 1 && (
+            <button
+              className="absolute right-5 top-1/2 -translate-y-1/2 text-white text-[20px] opacity-50 hover:opacity-100 transition-opacity px-4 py-2"
+              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => i + 1); }}
+            >
+              ›
+            </button>
+          )}
+
+          {/* Counter */}
+          {sortedImages.length > 1 && (
+            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/40 text-[10px] uppercase tracking-widest">
+              {selectedImage + 1} / {sortedImages.length}
+            </p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
