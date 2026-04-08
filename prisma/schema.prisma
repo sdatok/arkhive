@@ -78,6 +78,7 @@ enum ProductStatus {
   DRAFT
   ACTIVE
   SOLD
+  ARCHIVED
 }
 
 enum OrderStatus {

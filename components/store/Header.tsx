@@ -25,19 +25,19 @@ export default function Header() {
           <nav className="hidden md:flex items-center gap-7">
             <Link
               href="/shop"
-              className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
+              className="text-black text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
             >
               Shop
             </Link>
             <Link
               href="/shop?category=New+Arrivals"
-              className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
+              className="text-black text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
             >
               New
             </Link>
             <Link
               href="/sell"
-              className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
+              className="text-black text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
             >
               Sell
             </Link>
@@ -46,7 +46,7 @@ export default function Header() {
           {/* Logo center */}
           <Link
             href="/"
-            className="absolute left-1/2 -translate-x-1/2 text-[13px] uppercase tracking-[0.2em] font-black"
+            className="text-black absolute left-1/2 -translate-x-1/2 text-[13px] uppercase tracking-[0.2em] font-black"
           >
             ARKHIVE
           </Link>

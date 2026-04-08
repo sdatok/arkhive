@@ -1,4 +1,4 @@
-export type ProductStatus = "DRAFT" | "ACTIVE" | "SOLD";
+export type ProductStatus = "DRAFT" | "ACTIVE" | "SOLD" | "ARCHIVED";
 export type OrderStatus =
   | "PENDING"
   | "PAID"

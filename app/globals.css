@@ -48,8 +48,6 @@ button {
   background: #d4d4d4;
 }
 
-/* Remove Next.js default page styles */
 a {
-  color: inherit;
   text-decoration: none;
 }

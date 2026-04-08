@@ -16,21 +16,16 @@ export default function AdminProductTable({
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
-  async function handleDelete(id: string, name: string) {
-    if (!confirm(`Delete "${name}"? This cannot be undone.`)) return;
+  async function handleArchive(id: string, name: string) {
+    if (!confirm(`Archive "${name}"? It will be hidden from the store but not deleted.`)) return;
     setDeletingId(id);
-    try {
-      const res = await fetch(`/api/products/${id}`, { method: "DELETE" });
-      if (res.ok) {
-        router.refresh();
-      } else {
-        alert("Failed to delete product");
-      }
-    } catch {
-      alert("Something went wrong");
-    } finally {
-      setDeletingId(null);
-    }
+    await fetch(`/api/products/${id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "ARCHIVED" }),
+    });
+    setDeletingId(null);
+    router.refresh();
   }
 
   async function handleStatusChange(id: string, status: string) {
@@ -139,12 +134,15 @@ export default function AdminProductTable({
                         ? "border-green-300 bg-green-50 text-green-700"
                         : product.status === "SOLD"
                         ? "border-neutral-300 bg-neutral-100 text-neutral-500"
+                        : product.status === "ARCHIVED"
+                        ? "border-neutral-300 bg-neutral-200 text-neutral-400"
                         : "border-yellow-300 bg-yellow-50 text-yellow-700"
                     }`}
                   >
                     <option value="DRAFT">Draft</option>
                     <option value="ACTIVE">Active</option>
                     <option value="SOLD">Sold</option>
+                    <option value="ARCHIVED">Archived</option>
                   </select>
                 </td>
 
@@ -158,11 +156,11 @@ export default function AdminProductTable({
                       Edit
                     </Link>
                     <button
-                      onClick={() => handleDelete(product.id, product.name)}
+                      onClick={() => handleArchive(product.id, product.name)}
                       disabled={deletingId === product.id}
-                      className="text-[11px] uppercase tracking-widest text-red-500 hover:text-red-700 disabled:opacity-50"
+                      className="text-[11px] uppercase tracking-widest text-neutral-400 hover:text-black disabled:opacity-50"
                     >
-                      {deletingId === product.id ? "..." : "Delete"}
+                      {deletingId === product.id ? "..." : "Archive"}
                     </button>
                   </div>
                 </td>

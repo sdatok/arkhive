@@ -44,7 +44,7 @@ export default async function HomePage() {
           </p>
           <Link
             href="/shop"
-            className="inline-block border border-black px-10 py-3 text-[11px] uppercase tracking-widest font-medium hover:bg-black hover:text-white transition-colors duration-200"
+            className="inline-block border border-black text-black px-10 py-3 text-[11px] uppercase tracking-widest font-medium hover:bg-black hover:text-white transition-colors duration-200"
           >
             Shop Now
           </Link>
