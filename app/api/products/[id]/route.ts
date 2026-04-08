@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
+import { revalidateProductPages } from "@/lib/revalidate-store";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -59,6 +60,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
       });
     });
 
+    revalidateProductPages(product.slug);
     return NextResponse.json(product);
   } catch (err: unknown) {
     console.error(err);
@@ -84,6 +86,7 @@ export async function PATCH(request: Request, { params }: RouteParams) {
       return NextResponse.json({ error: "No patchable fields" }, { status: 400 });
     }
     const product = await prisma.product.update({ where: { id }, data });
+    revalidateProductPages(product.slug);
     return NextResponse.json(product);
   } catch {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
@@ -96,7 +99,12 @@ export async function DELETE(_req: Request, { params }: RouteParams) {
 
   const { id } = await params;
   try {
+    const existing = await prisma.product.findUnique({
+      where: { id },
+      select: { slug: true },
+    });
     await prisma.product.delete({ where: { id } });
+    revalidateProductPages(existing?.slug ?? null);
     return NextResponse.json({ ok: true });
   } catch {
     return NextResponse.json({ error: "Failed to delete" }, { status: 500 });

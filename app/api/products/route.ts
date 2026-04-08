@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
+import { revalidateProductPages } from "@/lib/revalidate-store";
 
 export async function GET() {
   try {
@@ -54,6 +55,7 @@ export async function POST(request: Request) {
       include: { images: true },
     });
 
+    revalidateProductPages(product.slug);
     return NextResponse.json(product, { status: 201 });
   } catch (err: unknown) {
     console.error(err);

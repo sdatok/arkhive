@@ -13,7 +13,7 @@ async function getFeaturedProducts(): Promise<Product[]> {
       where: { status: "ACTIVE" },
       include: { images: { orderBy: { displayOrder: "asc" } } },
       orderBy: { createdAt: "desc" },
-      take: 8,
+      take: 16,
     });
     return products.map((p) => ({
       ...p,
