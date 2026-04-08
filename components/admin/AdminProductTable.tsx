@@ -103,8 +103,8 @@ export default function AdminProductTable({
           {errorMsg}
         </div>
       )}
-    <div className="bg-white border border-neutral-200 rounded overflow-hidden">
-      <table className="w-full">
+    <div className="bg-white border border-neutral-200 rounded overflow-x-auto overscroll-x-contain">
+      <table className="w-full min-w-[640px]">
         <thead>
           <tr className="border-b border-neutral-200">
             <th className="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-neutral-500 font-medium w-16">
@@ -122,7 +122,7 @@ export default function AdminProductTable({
             <th className="text-left px-4 py-3 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
               Status
             </th>
-            <th className="text-right px-4 py-3 text-[10px] uppercase tracking-widest text-neutral-500 font-medium">
+            <th className="text-right px-4 py-3 text-[10px] uppercase tracking-widest text-neutral-500 font-medium whitespace-nowrap">
               Actions
             </th>
           </tr>
@@ -202,8 +202,8 @@ export default function AdminProductTable({
                 </td>
 
                 {/* Actions */}
-                <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-3">
+                <td className="px-4 py-3 text-right whitespace-nowrap">
+                  <div className="flex items-center justify-end gap-3 shrink-0">
                     <Link
                       href={`/admin/products/${product.id}`}
                       className="text-[11px] uppercase tracking-widest hover:underline"
