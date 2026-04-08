@@ -6,7 +6,7 @@ import Link from "next/link";
 import type { Product } from "@/types";
 
 /** Most recent featured products shown in the slice strip (desktop + mobile). */
-const MAX_SLICES = 8;
+const MAX_SLICES = 10;
 
 interface SlicedPreviewProps {
   products: Product[];
