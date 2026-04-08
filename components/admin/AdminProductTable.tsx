@@ -10,30 +10,48 @@ interface AdminProductTableProps {
   products: (Product & { images: { id: string; url: string; displayOrder: number }[] })[];
 }
 
+type StatusMap = Record<string, string>;
+
 export default function AdminProductTable({
   products,
 }: AdminProductTableProps) {
   const router = useRouter();
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [archivingId, setArchivingId] = useState<string | null>(null);
+  const [savingId, setSavingId] = useState<string | null>(null);
+  // Optimistic local status per product id
+  const [statusMap, setStatusMap] = useState<StatusMap>(() =>
+    Object.fromEntries(products.map((p) => [p.id, p.status]))
+  );
 
   async function handleArchive(id: string, name: string) {
     if (!confirm(`Archive "${name}"? It will be hidden from the store but not deleted.`)) return;
-    setDeletingId(id);
-    await fetch(`/api/products/${id}`, {
+    setArchivingId(id);
+    setStatusMap((prev) => ({ ...prev, [id]: "ARCHIVED" }));
+    const res = await fetch(`/api/products/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status: "ARCHIVED" }),
     });
-    setDeletingId(null);
+    setArchivingId(null);
+    if (!res.ok) {
+      setStatusMap((prev) => ({ ...prev, [id]: products.find((p) => p.id === id)?.status ?? "DRAFT" }));
+    }
     router.refresh();
   }
 
   async function handleStatusChange(id: string, status: string) {
-    await fetch(`/api/products/${id}`, {
+    const previous = statusMap[id];
+    setStatusMap((prev) => ({ ...prev, [id]: status }));
+    setSavingId(id);
+    const res = await fetch(`/api/products/${id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status }),
     });
+    setSavingId(null);
+    if (!res.ok) {
+      setStatusMap((prev) => ({ ...prev, [id]: previous }));
+    }
     router.refresh();
   }
 
@@ -124,26 +142,32 @@ export default function AdminProductTable({
 
                 {/* Status */}
                 <td className="px-4 py-3">
-                  <select
-                    value={product.status}
-                    onChange={(e) =>
-                      handleStatusChange(product.id, e.target.value)
-                    }
-                    className={`text-[10px] uppercase tracking-widest px-2 py-1 border focus:outline-none ${
-                      product.status === "ACTIVE"
-                        ? "border-green-300 bg-green-50 text-green-700"
-                        : product.status === "SOLD"
-                        ? "border-neutral-300 bg-neutral-100 text-neutral-500"
-                        : product.status === "ARCHIVED"
-                        ? "border-neutral-300 bg-neutral-200 text-neutral-400"
-                        : "border-yellow-300 bg-yellow-50 text-yellow-700"
-                    }`}
-                  >
-                    <option value="DRAFT">Draft</option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="SOLD">Sold</option>
-                    <option value="ARCHIVED">Archived</option>
-                  </select>
+                  <div className="flex items-center gap-1.5">
+                    <select
+                      value={statusMap[product.id] ?? product.status}
+                      disabled={savingId === product.id}
+                      onChange={(e) =>
+                        handleStatusChange(product.id, e.target.value)
+                      }
+                      className={`text-[10px] uppercase tracking-widest px-2 py-1 border focus:outline-none disabled:opacity-60 ${
+                        (statusMap[product.id] ?? product.status) === "ACTIVE"
+                          ? "border-green-300 bg-green-50 text-green-700"
+                          : (statusMap[product.id] ?? product.status) === "SOLD"
+                          ? "border-neutral-300 bg-neutral-100 text-neutral-500"
+                          : (statusMap[product.id] ?? product.status) === "ARCHIVED"
+                          ? "border-neutral-300 bg-neutral-200 text-neutral-400"
+                          : "border-yellow-300 bg-yellow-50 text-yellow-700"
+                      }`}
+                    >
+                      <option value="DRAFT">Draft</option>
+                      <option value="ACTIVE">Active</option>
+                      <option value="SOLD">Sold</option>
+                      <option value="ARCHIVED">Archived</option>
+                    </select>
+                    {savingId === product.id && (
+                      <span className="text-[9px] text-neutral-400 uppercase tracking-widest">saving…</span>
+                    )}
+                  </div>
                 </td>
 
                 {/* Actions */}
@@ -155,13 +179,15 @@ export default function AdminProductTable({
                     >
                       Edit
                     </Link>
-                    <button
-                      onClick={() => handleArchive(product.id, product.name)}
-                      disabled={deletingId === product.id}
-                      className="text-[11px] uppercase tracking-widest text-neutral-400 hover:text-black disabled:opacity-50"
-                    >
-                      {deletingId === product.id ? "..." : "Archive"}
-                    </button>
+                    {(statusMap[product.id] ?? product.status) !== "ARCHIVED" && (
+                      <button
+                        onClick={() => handleArchive(product.id, product.name)}
+                        disabled={archivingId === product.id}
+                        className="text-[11px] uppercase tracking-widest text-neutral-400 hover:text-black disabled:opacity-50"
+                      >
+                        {archivingId === product.id ? "..." : "Archive"}
+                      </button>
+                    )}
                   </div>
                 </td>
               </tr>

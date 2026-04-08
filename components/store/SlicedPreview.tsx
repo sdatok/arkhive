@@ -17,6 +17,11 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
     .filter((p) => p.images.length > 0)
     .slice(0, 6);
 
+  // The max expanded slice width as % of the full container.
+  // Image wrappers are fixed to this width so object-cover never rescales.
+  const basePercent = 100 / slices.length;
+  const expandedPercent = basePercent * 2.5; // matches the hover multiplier below
+
   if (slices.length === 0) return null;
 
   return (
@@ -32,8 +37,6 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
           const isOther = hoveredIdx !== null && !isHovered;
 
           // Width: hovered slice gets ~2.5× the base, others shrink
-          // Using inline style for smooth arbitrary-width transitions
-          const basePercent = 100 / slices.length;
           const hoveredPercent = basePercent * 2.5;
           const otherPercent =
             (100 - hoveredPercent) / (slices.length - 1);
@@ -43,6 +46,9 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
             : isHovered
             ? `${hoveredPercent}%`
             : `${otherPercent}%`;
+
+          // Clamp: cap at 1400px max-width so vw math matches the container
+          const imgWrapperWidth = `min(${expandedPercent}vw, ${(1400 * expandedPercent) / 100}px)`;
 
           return (
             <Link
@@ -55,14 +61,20 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
               }}
               onMouseEnter={() => setHoveredIdx(idx)}
             >
-              {/* Image */}
-              <Image
-                src={img.url}
-                alt={product.name}
-                fill
-                className="object-cover object-center"
-                sizes="(max-width: 768px) 50vw, 25vw"
-              />
+              {/* Fixed-size image wrapper — width never changes so object-cover
+                  never rescales. The slice container clips via overflow:hidden. */}
+              <div
+                className="absolute top-0 left-1/2 -translate-x-1/2 h-full"
+                style={{ width: imgWrapperWidth }}
+              >
+                <Image
+                  src={img.url}
+                  alt={product.name}
+                  fill
+                  className="object-cover object-center"
+                  sizes="(max-width: 768px) 50vw, 33vw"
+                />
+              </div>
 
               {/* Dark overlay — fades away on hover */}
               <div

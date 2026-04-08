@@ -74,10 +74,16 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   const { id } = await params;
   try {
     const body = await request.json();
-    const product = await prisma.product.update({
-      where: { id },
-      data: body,
-    });
+    // Only allow patching explicit scalar fields to prevent accidental overwrites
+    const allowed = ["status", "quantity", "price"] as const;
+    const data: Record<string, unknown> = {};
+    for (const key of allowed) {
+      if (key in body) data[key] = body[key];
+    }
+    if (Object.keys(data).length === 0) {
+      return NextResponse.json({ error: "No patchable fields" }, { status: 400 });
+    }
+    const product = await prisma.product.update({ where: { id }, data });
     return NextResponse.json(product);
   } catch {
     return NextResponse.json({ error: "Failed to update" }, { status: 500 });
