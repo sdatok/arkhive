@@ -11,6 +11,7 @@ async function getAllProducts() {
     return products.map((p) => ({
       ...p,
       price: Number(p.price),
+      sizePricing: p.sizePricing as Record<string, number> | null,
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));
