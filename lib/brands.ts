@@ -10,6 +10,7 @@ export const KNOWN_BRANDS = [
   "Dior",
   "Fear of God",
   "Gucci",
+  "Hellstar",
   "Jordan Brand",
   "Kith",
   "Louis Vuitton",
@@ -27,3 +28,9 @@ export const KNOWN_BRANDS = [
   "Versace",
   "Yeezy",
 ].sort((a, b) => a.localeCompare(b));
+
+/** Brands shown in Shop by Brand: curated list plus any active inventory brands. */
+export function brandsForShowcase(fromInventory: string[]): string[] {
+  const set = new Set<string>([...KNOWN_BRANDS, ...fromInventory]);
+  return Array.from(set).sort((a, b) => a.localeCompare(b));
+}
