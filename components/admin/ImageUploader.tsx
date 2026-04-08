@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import Image from "next/image";
 
 export interface UploadedImage {
@@ -19,43 +19,69 @@ export default function ImageUploader({
 }: ImageUploaderProps) {
   const [images, setImages] = useState<UploadedImage[]>(existingImages);
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const onChangeRef = useRef(onChange);
+  onChangeRef.current = onChange;
 
-  const updateImages = useCallback(
-    (updated: UploadedImage[]) => {
-      const reordered = updated.map((img, idx) => ({
-        ...img,
-        displayOrder: idx,
-      }));
-      setImages(reordered);
-      onChange(reordered);
-    },
-    [onChange]
-  );
+  // Keep parent form in sync without calling onChange inside setState updaters
+  // (that triggers "Cannot update ProductForm while rendering ImageUploader").
+  useEffect(() => {
+    onChangeRef.current(images);
+  }, [images]);
+
+  const updateImages = useCallback((updated: UploadedImage[]) => {
+    const reordered = updated.map((img, idx) => ({
+      ...img,
+      displayOrder: idx,
+    }));
+    setImages(reordered);
+  }, []);
 
   async function uploadFiles(files: File[]) {
     setUploading(true);
+    setUploadError(null);
     const newImages: UploadedImage[] = [];
 
-    for (const file of files) {
-      if (!file.type.startsWith("image/")) continue;
-      const formData = new FormData();
-      formData.append("file", file);
+    try {
+      for (const file of files) {
+        if (!file.type.startsWith("image/")) continue;
+        const formData = new FormData();
+        formData.append("file", file);
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+          credentials: "include",
+        });
 
-      if (res.ok) {
-        const { url } = await res.json();
-        newImages.push({ url, displayOrder: 0 });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.url) newImages.push({ url: data.url, displayOrder: 0 });
+        } else {
+          const data = await res.json().catch(() => ({}));
+          const msg =
+            data.error ??
+            (res.status === 401
+              ? "Session expired — sign in again"
+              : `Upload failed (${res.status})`);
+          setUploadError(msg);
+        }
       }
-    }
 
-    setUploading(false);
-    updateImages([...images, ...newImages]);
+      if (newImages.length > 0) {
+        setImages((prev) => {
+          const merged = [...prev, ...newImages];
+          return merged.map((img, idx) => ({
+            ...img,
+            displayOrder: idx,
+          }));
+        });
+      }
+    } finally {
+      setUploading(false);
+    }
   }
 
   function handleDrop(e: React.DragEvent) {
@@ -121,6 +147,12 @@ export default function ImageUploader({
         )}
       </div>
 
+      {uploadError && (
+        <p className="mt-3 text-[11px] text-red-600 uppercase tracking-widest">
+          {uploadError}
+        </p>
+      )}
+
       {/* Preview grid */}
       {images.length > 0 && (
         <div className="mt-4 grid grid-cols-4 sm:grid-cols-6 gap-2">
@@ -133,6 +165,9 @@ export default function ImageUploader({
                   fill
                   className="object-cover"
                   sizes="100px"
+                  unoptimized={
+                    img.url.startsWith("/api/") || img.url.startsWith("/products/")
+                  }
                 />
                 {idx === 0 && (
                   <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white text-[9px] uppercase tracking-wider text-center py-0.5">

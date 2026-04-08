@@ -21,6 +21,7 @@ Required env vars:
 | `DATABASE_URL` | [neon.tech](https://neon.tech) → your project → Connection string |
 | `DIRECT_URL` | Same as `DATABASE_URL` (used by Prisma migrations) |
 | `BLOB_READ_WRITE_TOKEN` | Vercel dashboard → Storage → Blob → your store → Tokens |
+| `BLOB_PUT_ACCESS` | **`private`** if the store is **Private** (required for uploads to succeed). Use **`public`** or omit only if the store is **Public**. |
 | `ADMIN_PASSWORD` | Any password you choose |
 | `SESSION_SECRET` | Run: `openssl rand -base64 32` |
 

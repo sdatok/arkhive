@@ -1,14 +1,20 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { saveUploadedImage } from "@/lib/server-upload";
+
+export const runtime = "nodejs";
 
 // Public upload endpoint — used by the /sell form (no auth required)
 export async function POST(request: Request) {
-  const formData = await request.formData();
+  let formData: FormData;
+  try {
+    formData = await request.formData();
+  } catch {
+    return NextResponse.json({ error: "Invalid form data" }, { status: 400 });
+  }
+
   const file = formData.get("file") as File | null;
 
-  if (!file) {
+  if (!file || typeof file === "string") {
     return NextResponse.json({ error: "No file provided" }, { status: 400 });
   }
 
@@ -21,25 +27,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "File too large (max 10MB)" }, { status: 400 });
   }
 
-  const safeName = `${Date.now()}-${file.name.replace(/[^a-z0-9.\-_]/gi, "-")}`;
-
-  // Local dev fallback
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    const uploadDir = path.join(process.cwd(), "public", "submissions");
-    await mkdir(uploadDir, { recursive: true });
-    const bytes = await file.arrayBuffer();
-    await writeFile(path.join(uploadDir, safeName), Buffer.from(bytes));
-    return NextResponse.json({ url: `/submissions/${safeName}` });
+  const result = await saveUploadedImage(file, "submissions");
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
   }
-
-  try {
-    const blob = await put(`submissions/${safeName}`, file, {
-      access: "public",
-      token: process.env.BLOB_READ_WRITE_TOKEN,
-    });
-    return NextResponse.json({ url: blob.url });
-  } catch (err) {
-    console.error(err);
-    return NextResponse.json({ error: "Upload failed" }, { status: 500 });
-  }
+  return NextResponse.json({ url: result.url });
 }
