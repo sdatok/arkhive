@@ -1,36 +1,141 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Silk Archive
 
-## Getting Started
+Designer · Luxury · Streetwear — a clean, Supreme-inspired e-commerce store.
 
-First, run the development server:
+**Stack:** Next.js 16 · TypeScript · Tailwind CSS v4 · Prisma · Neon Postgres · Vercel Blob  
+**Monthly cost:** $0 to start (Vercel Hobby + Neon free tier + Vercel Blob free tier)
+
+---
+
+## Local Development
+
+### 1. Copy env file and fill in values
+
+```bash
+cp .env.example .env
+```
+
+Required env vars:
+| Variable | Source |
+|---|---|
+| `DATABASE_URL` | [neon.tech](https://neon.tech) → your project → Connection string |
+| `DIRECT_URL` | Same as `DATABASE_URL` (used by Prisma migrations) |
+| `BLOB_READ_WRITE_TOKEN` | Vercel dashboard → Storage → Blob → your store → Tokens |
+| `ADMIN_PASSWORD` | Any password you choose |
+| `SESSION_SECRET` | Run: `openssl rand -base64 32` |
+
+### 2. Push database schema
+
+```bash
+npm run db:push
+```
+
+### 3. Run dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- Store: http://localhost:3000
+- Admin: http://localhost:3000/admin
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deployment (Vercel)
 
-## Learn More
+1. Push to GitHub
+2. Go to [vercel.com](https://vercel.com) → New Project → import repo
+3. Add env vars in Vercel dashboard (same 5 variables from `.env.example`)
+4. Deploy — Vercel auto-builds on every push
 
-To learn more about Next.js, take a look at the following resources:
+**Vercel Blob setup:**
+- Vercel dashboard → Storage → Create Database → Blob
+- Copy the `BLOB_READ_WRITE_TOKEN` into your env vars
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Neon Postgres setup:**
+- [neon.tech](https://neon.tech) → New Project (free tier)
+- Copy the connection string as `DATABASE_URL` and `DIRECT_URL`
+- After first deploy, run `npm run db:push` locally pointing to your Neon DB
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Admin Panel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+URL: `/admin`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Login with your `ADMIN_PASSWORD`. From there you can:
+- Add products (name, brand, price, category, sizes, images, description)
+- Toggle status: **Draft** → **Active** → **Sold**
+- Edit or delete existing products
+
+---
+
+## StockX Scraper
+
+A local-only utility to seed your store with product data from StockX.
+
+**Setup (first time):**
+```bash
+npx playwright install chromium
+```
+
+**Usage:**
+```bash
+npm run scrape -- \
+  --url "https://stockx.com/arcteryx-bird-head-toque-nightscape" \
+  --slug "arcteryx-bird-head-toque" \
+  --price 85 \
+  --sizes "S/M,L/XL" \
+  --category "Headwear"
+```
+
+This will:
+1. Scrape product name, brand, and images from StockX
+2. Upload images to Vercel Blob
+3. Create a **Draft** product in your database
+4. Print the admin URL to set price and publish
+
+> **Note:** The scraper is a local dev tool only. Replace scraped images with your own photos over time.
+
+---
+
+## Adding Stripe (future)
+
+When ready to accept payments:
+
+```bash
+npm install stripe @stripe/stripe-js
+```
+
+Add to `.env`:
+```
+STRIPE_SECRET_KEY=sk_live_...
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+```
+
+The checkout button in `CartDrawer.tsx` is already stubbed — replace the disabled button with a Stripe Checkout Session redirect.
+
+---
+
+## Project Structure
+
+```
+app/
+  (store)/          # Public storefront (/, /shop, /product/[slug])
+  admin/            # Password-protected admin panel
+  api/              # API routes (products CRUD, auth, upload)
+components/
+  store/            # ProductCard, ProductGrid, Header, CartDrawer, etc.
+  admin/            # ProductForm, ImageUploader, AdminProductTable
+context/
+  CartContext.tsx   # localStorage cart state
+lib/
+  db.ts             # Prisma client
+  auth.ts           # JWT session helpers
+  blob.ts           # Vercel Blob upload helpers
+prisma/
+  schema.prisma     # Product, ProductImage, Order schema
+proxy.ts            # Admin route protection (Next.js 16 Proxy)
+scripts/
+  scrape-stockx.ts  # Local StockX scraper utility
+```
