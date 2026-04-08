@@ -43,6 +43,7 @@ export interface CartItem {
 export const CATEGORIES = [
   "Outerwear",
   "Tops",
+  "Jersey",
   "Bottoms",
   "Footwear",
   "Accessories",

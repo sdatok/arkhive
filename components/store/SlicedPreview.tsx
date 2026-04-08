@@ -5,6 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types";
 
+/** Matches homepage featured count — show every featured product with an image, up to this many. */
+const MAX_SLICES = 16;
+
 interface SlicedPreviewProps {
   products: Product[];
 }
@@ -12,10 +15,9 @@ interface SlicedPreviewProps {
 export default function SlicedPreview({ products }: SlicedPreviewProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
 
-  // Use up to 6 products that have images
   const slices = products
     .filter((p) => p.images.length > 0)
-    .slice(0, 6);
+    .slice(0, MAX_SLICES);
 
   // The max expanded slice width as % of the full container.
   // Image wrappers are fixed to this width so object-cover never rescales.
@@ -72,7 +74,7 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
                   alt={product.name}
                   fill
                   className="object-cover object-center"
-                  sizes="(max-width: 768px) 50vw, 33vw"
+                  sizes="(max-width: 768px) 25vw, 15vw"
                 />
               </div>
 
