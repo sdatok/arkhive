@@ -44,8 +44,8 @@ export default function HeroSection() {
   return (
     <section className="border-b border-neutral-200">
       <style>{`@keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }`}</style>
-      <div className="max-w-[1400px] mx-auto px-4 py-20 md:py-32 flex flex-col items-center text-center">
-        <h1 className="text-[52px] md:text-[96px] font-black uppercase tracking-[-0.03em] leading-none mb-8">
+      <div className="max-w-[1400px] mx-auto px-4 py-12 md:py-20 flex flex-col items-center text-center">
+        <h1 className="text-[42px] md:text-[72px] font-black uppercase tracking-[-0.03em] leading-none mb-6">
           ARKHIVE
         </h1>
 

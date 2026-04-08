@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import ImageUploader, { type UploadedImage } from "./ImageUploader";
 import { CATEGORIES } from "@/types";
 import type { Product } from "@/types";
+import { KNOWN_BRANDS } from "@/lib/brands";
 
 const SIZE_PRESETS: Record<string, string[]> = {
   Clothing: ["XS", "S", "M", "L", "XL", "XXL"],
@@ -62,12 +63,17 @@ export default function ProductForm({
   const [brandOpen, setBrandOpen] = useState(false);
   const brandRef = useRef<HTMLDivElement>(null);
 
-  const filteredBrands = existingBrands.filter((b) =>
+  // Merge DB brands with the known brands list, deduplicated and sorted
+  const allBrands = Array.from(
+    new Set([...KNOWN_BRANDS, ...existingBrands])
+  ).sort((a, b) => a.localeCompare(b));
+
+  const filteredBrands = allBrands.filter((b) =>
     b.toLowerCase().includes(brandInput.toLowerCase())
   );
   const showNewOption =
     brandInput.trim() &&
-    !existingBrands.some(
+    !allBrands.some(
       (b) => b.toLowerCase() === brandInput.trim().toLowerCase()
     );
 

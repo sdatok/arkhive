@@ -4,6 +4,7 @@ import ProductGrid from "@/components/store/ProductGrid";
 import SlicedPreview from "@/components/store/SlicedPreview";
 import Reviews from "@/components/store/Reviews";
 import HeroSection from "@/components/store/HeroSection";
+import BrandShowcase from "@/components/store/BrandShowcase";
 import type { Product } from "@/types";
 
 async function getFeaturedProducts(): Promise<Product[]> {
@@ -36,6 +37,9 @@ export default async function HomePage() {
       {/* Sliced product preview */}
       {featured.length > 0 && <SlicedPreview products={featured} />}
 
+      {/* Shop by Brand */}
+      <BrandShowcase />
+
       {/* New Arrivals grid */}
       {featured.length > 0 && (
         <section className="mt-0">
@@ -64,31 +68,6 @@ export default async function HomePage() {
 
       {/* Reviews */}
       <Reviews />
-
-      {/* Brand strip */}
-      <section className="border-t border-neutral-200 mt-16">
-        <div className="max-w-[1400px] mx-auto px-4 py-12">
-          <div className="flex flex-wrap justify-center gap-x-10 gap-y-4">
-            {[
-              "Arc'teryx",
-              "Stone Island",
-              "Supreme",
-              "Off-White",
-              "Stüssy",
-              "Fear of God",
-              "Loro Piana",
-            ].map((brand) => (
-              <Link
-                key={brand}
-                href={`/shop?brand=${encodeURIComponent(brand)}`}
-                className="text-[11px] uppercase tracking-widest text-neutral-400 hover:text-black transition-colors"
-              >
-                {brand}
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
     </div>
   );
 }
