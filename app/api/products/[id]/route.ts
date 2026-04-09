@@ -30,7 +30,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
   try {
     const body = await request.json();
-    const { name, brand, slug, description, price, category, status, sizes, sizePricing, quantity, images } = body;
+    const { name, brand, slug, description, price, category, status, sizes, sizePricing, quantity, images, consignment } = body;
 
     // Update product in a transaction: delete old images, create new ones
     const product = await prisma.$transaction(async (tx) => {
@@ -49,6 +49,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
           sizes,
           sizePricing: sizePricing ?? null,
           quantity: quantity ?? 1,
+          consignment: Boolean(consignment),
           images: {
             create: (images ?? []).map(
               (img: { url: string; displayOrder: number }) => ({

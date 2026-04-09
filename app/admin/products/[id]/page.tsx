@@ -21,6 +21,7 @@ async function getProduct(id: string): Promise<Product | null> {
       ...product,
       price: Number(product.price),
       sizePricing: product.sizePricing as Record<string, number> | null,
+      consignment: Boolean(product.consignment),
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
     };

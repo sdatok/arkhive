@@ -39,6 +39,7 @@ export default function ProductForm({
     status: product?.status ?? "DRAFT",
     sizes: product?.sizes ?? [] as string[],
     quantity: product?.quantity?.toString() ?? "1",
+    consignment: product?.consignment ?? false,
   });
 
   const [sizePricing, setSizePricing] = useState<Record<string, string>>(
@@ -343,6 +344,24 @@ export default function ProductForm({
             />
           </div>
         </div>
+
+        <label className="flex items-start gap-3 cursor-pointer rounded border border-neutral-200 px-4 py-3.5 hover:border-neutral-300 transition-colors">
+          <input
+            type="checkbox"
+            checked={form.consignment}
+            onChange={(e) => update("consignment", e.target.checked)}
+            className="mt-0.5 h-4 w-4 shrink-0 rounded border-neutral-300 text-black focus:ring-1 focus:ring-black focus:ring-offset-0"
+          />
+          <span>
+            <span className="block text-[11px] uppercase tracking-widest font-medium text-black">
+              Consignment
+            </span>
+            <span className="block text-[10px] text-neutral-500 mt-1 leading-relaxed">
+              When on, the product page shows a consignment label and
+              &ldquo;Pre-owned · Excellent condition&rdquo; for buyers.
+            </span>
+          </span>
+        </label>
 
         <div>
           <label className="block text-[10px] uppercase tracking-widest text-neutral-500 mb-2">

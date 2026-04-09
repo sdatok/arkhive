@@ -24,6 +24,8 @@ export interface Product {
   sizes: string[];
   sizePricing: Record<string, number> | null;
   quantity: number;
+  /** Curated resale — shown on PDP with condition copy when true */
+  consignment: boolean;
   images: ProductImage[];
   createdAt: string;
   updatedAt: string;

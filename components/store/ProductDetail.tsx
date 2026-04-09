@@ -126,7 +126,21 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           <p className="text-[11px] uppercase tracking-widest text-neutral-400">
             {product.brand}
           </p>
-          <h1 className="text-[20px] md:text-[24px] font-bold mt-1 leading-tight">
+          {product.consignment && (
+            <div className="mt-3 flex flex-col gap-2">
+              <span className="inline-flex w-fit items-center border-b border-neutral-900 pb-1 text-[9px] font-medium uppercase tracking-[0.28em] text-neutral-800">
+                Consignment
+              </span>
+              <p className="text-[12px] font-normal leading-relaxed tracking-wide text-neutral-500">
+                Pre-owned · Excellent condition
+              </p>
+            </div>
+          )}
+          <h1
+            className={`text-[20px] md:text-[24px] font-bold leading-tight ${
+              product.consignment ? "mt-4" : "mt-1"
+            }`}
+          >
             {product.name}
           </h1>
           <p className="text-[18px] font-medium mt-3">

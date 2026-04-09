@@ -20,6 +20,7 @@ model Product {
   sizes       String[]
   sizePricing Json?
   quantity    Int            @default(1)
+  consignment Boolean        @default(false)
   images      ProductImage[]
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt

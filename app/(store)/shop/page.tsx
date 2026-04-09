@@ -51,6 +51,7 @@ async function getProducts(filters: {
         ...p,
         price: Number(p.price),
         sizePricing: p.sizePricing as Record<string, number> | null,
+        consignment: Boolean(p.consignment),
         createdAt: p.createdAt.toISOString(),
         updatedAt: p.updatedAt.toISOString(),
       })),

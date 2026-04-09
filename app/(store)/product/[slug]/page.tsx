@@ -20,6 +20,7 @@ async function getProduct(slug: string): Promise<Product | null> {
       ...product,
       price: Number(product.price),
       sizePricing: product.sizePricing as Record<string, number> | null,
+      consignment: Boolean(product.consignment),
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
     };
@@ -43,6 +44,7 @@ async function getRelated(
       ...p,
       price: Number(p.price),
       sizePricing: p.sizePricing as Record<string, number> | null,
+      consignment: Boolean(p.consignment),
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));

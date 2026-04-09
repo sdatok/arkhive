@@ -153,16 +153,6 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
                   </p>
                 </div>
               </div>
-
-              <div
-                className={`absolute top-3 md:top-4 left-0 right-0 flex justify-center transition-opacity duration-300 ${
-                  isIdle ? "opacity-90" : "opacity-0"
-                }`}
-              >
-                <span className="text-[9px] uppercase tracking-[0.2em] font-medium px-2 py-1 rounded-sm bg-black/35 text-white backdrop-blur-[2px]">
-                  {String(idx + 1).padStart(2, "0")}
-                </span>
-              </div>
             </Link>
           );
         })}

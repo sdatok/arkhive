@@ -27,7 +27,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await request.json();
-    const { name, brand, slug, description, price, category, status, sizes, sizePricing, quantity, images } = body;
+    const { name, brand, slug, description, price, category, status, sizes, sizePricing, quantity, images, consignment } = body;
 
     if (!name || !brand || !slug || !price || !category) {
       return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -45,6 +45,7 @@ export async function POST(request: Request) {
         sizes: sizes ?? [],
         sizePricing: sizePricing ?? null,
         quantity: quantity ?? 1,
+        consignment: Boolean(consignment),
         images: {
           create: (images ?? []).map(
             (img: { url: string; displayOrder: number }) => ({
