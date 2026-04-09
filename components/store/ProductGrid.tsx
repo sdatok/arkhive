@@ -36,9 +36,9 @@ export default function ProductGrid({
 
   return (
     <div className="px-4">
-      <div className={`grid ${gridCols[columns]} gap-px bg-white`}>
+      <div className={`grid ${gridCols[columns]} gap-0`}>
         {items.map((product) => (
-          <div key={product.id} className="bg-white p-3 md:p-4">
+          <div key={product.id} className="bg-white">
             <ProductCard product={product} />
           </div>
         ))}

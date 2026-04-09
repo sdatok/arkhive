@@ -18,38 +18,40 @@ export default function ProductCard({ product, compact }: ProductCardProps) {
   return (
     <Link href={`/product/${product.slug}`} className="group block">
       {/* Image container */}
-      <div className="relative aspect-[3/4] bg-neutral-100 overflow-hidden">
+      <div className="relative aspect-[3/4] bg-white overflow-hidden">
         {primaryImage ? (
           <>
             <Image
               src={primaryImage.url}
               alt={product.name}
               fill
-              className={`object-cover transition-opacity duration-300 ${
+              className={`object-contain transition-opacity duration-300 ${
                 secondaryImage ? "group-hover:opacity-0" : ""
               }`}
               sizes={
                 compact
-                  ? "(max-width: 640px) 40vw, 220px"
-                  : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+                  ? "(max-width: 640px) 45vw, 260px"
+                  : "(max-width: 640px) 55vw, (max-width: 1024px) 38vw, 28vw"
               }
+              quality={88}
             />
             {secondaryImage && (
               <Image
                 src={secondaryImage.url}
                 alt={product.name}
                 fill
-                className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                className="object-contain opacity-0 transition-opacity duration-300 group-hover:opacity-100"
                 sizes={
                   compact
-                    ? "(max-width: 640px) 40vw, 220px"
-                    : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+                    ? "(max-width: 640px) 45vw, 260px"
+                    : "(max-width: 640px) 55vw, (max-width: 1024px) 38vw, 28vw"
                 }
+                quality={88}
               />
             )}
           </>
         ) : (
-          <div className="w-full h-full bg-neutral-200" />
+          <div className="w-full h-full bg-white" />
         )}
 
         {product.status === "SOLD" && (
@@ -66,7 +68,7 @@ export default function ProductCard({ product, compact }: ProductCardProps) {
         className={
           compact
             ? "mt-1.5"
-            : "mt-2 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200"
+            : "mt-2 px-2 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200"
         }
       >
         <p

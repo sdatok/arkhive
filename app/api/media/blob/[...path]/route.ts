@@ -31,8 +31,21 @@ export async function GET(
 
   const access = blobPutAccess();
   const token = process.env.BLOB_READ_WRITE_TOKEN?.trim();
+
   if (!token) {
-    return NextResponse.json({ error: "Storage not configured" }, { status: 503 });
+    const proxyBase = process.env.DEV_MEDIA_PROXY_BASE_URL?.trim().replace(/\/$/, "");
+    if (proxyBase && process.env.NODE_ENV === "development") {
+      const target = `${proxyBase}/api/media/blob/${pathname}`;
+      return NextResponse.redirect(target, 307);
+    }
+
+    return NextResponse.json(
+      {
+        error:
+          "Blob storage not configured locally. Add BLOB_READ_WRITE_TOKEN to .env (copy from Vercel → Project → Settings → Environment Variables), or set DEV_MEDIA_PROXY_BASE_URL to your production origin (e.g. https://your-app.vercel.app) so /api/media/blob/* can redirect there in development.",
+      },
+      { status: 503 }
+    );
   }
 
   try {

@@ -32,6 +32,15 @@ export default function ProductDetail({ product }: ProductDetailProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [lightboxOpen, sortedImages.length]);
 
+  useEffect(() => {
+    if (!lightboxOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
+  }, [lightboxOpen]);
+
   function handleAddToCart() {
     if (!selectedSize) {
       setSizeError(true);
@@ -60,9 +69,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 pb-12 md:pb-16">
       {/* Desktop: fixed-ish two columns, centered — keeps buy box from stretching edge-to-edge */}
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,420px)_minmax(0,340px)] md:max-w-[880px] lg:max-w-[920px] md:mx-auto gap-8 lg:gap-12 items-start">
-        {/* Images — capped width so photos aren’t upscaled on large screens */}
-        <div className="flex gap-3 w-full max-w-[400px] md:max-w-[420px] mx-auto md:mx-0">
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,480px)_minmax(0,340px)] md:max-w-[960px] lg:max-w-[1000px] md:mx-auto gap-8 lg:gap-12 items-start">
+        {/* Images — wider slot + contain so wide shots aren’t cropped at the sides */}
+        <div className="flex gap-3 w-full max-w-[min(100%,460px)] md:max-w-[480px] mx-auto md:mx-0">
           {/* Thumbnails */}
           {sortedImages.length > 1 && (
             <div className="flex flex-col gap-2 w-14 shrink-0">
@@ -90,7 +99,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Main image */}
           <div
-            className="relative flex-1 min-w-0 aspect-[3/4] bg-neutral-100 cursor-zoom-in"
+            className="relative flex-1 min-w-0 aspect-[3/4] max-h-[min(88vh,620px)] md:max-h-none bg-neutral-100 cursor-zoom-in"
             onClick={() => sortedImages[selectedImage] && setLightboxOpen(true)}
           >
             {sortedImages[selectedImage] ? (
@@ -98,9 +107,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 src={sortedImages[selectedImage].url}
                 alt={product.name}
                 fill
-                className="object-cover"
-                sizes="(max-width: 768px) 100vw, 420px"
-                quality={90}
+                className="object-contain"
+                sizes="(max-width: 768px) 96vw, 480px"
+                quality={92}
                 priority
               />
             ) : (
@@ -228,58 +237,72 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Lightbox */}
+      {/* Lightbox — backdrop receives outside taps; controls sit above image layer (full-bleed image div used to block Close on mobile) */}
       {lightboxOpen && sortedImages[selectedImage] && (
-        <div
-          className="fixed inset-0 z-[100] bg-black/95 flex items-center justify-center"
-          onClick={() => setLightboxOpen(false)}
-        >
-          {/* Close */}
-          <button
-            className="absolute top-5 right-6 text-white text-[11px] uppercase tracking-widest opacity-60 hover:opacity-100 transition-opacity"
+        <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Product image">
+          <div
+            className="absolute inset-0 bg-black/95"
             onClick={() => setLightboxOpen(false)}
+          />
+
+          <button
+            type="button"
+            className="absolute top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))] z-[110] min-h-11 min-w-11 px-3 flex items-center justify-center text-white text-[11px] uppercase tracking-widest bg-white/10 hover:bg-white/20 active:bg-white/25 rounded-sm transition-colors"
+            onClick={(e) => {
+              e.stopPropagation();
+              setLightboxOpen(false);
+            }}
           >
             Close
           </button>
 
-          {/* Prev */}
           {selectedImage > 0 && (
             <button
-              className="absolute left-5 top-1/2 -translate-y-1/2 text-white text-[20px] opacity-50 hover:opacity-100 transition-opacity px-4 py-2"
-              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => i - 1); }}
+              type="button"
+              className="absolute left-[max(0.75rem,env(safe-area-inset-left))] top-1/2 -translate-y-1/2 z-[110] min-h-11 min-w-11 flex items-center justify-center text-white text-[22px] leading-none opacity-80 hover:opacity-100 bg-white/10 rounded-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage((i) => i - 1);
+              }}
+              aria-label="Previous image"
             >
               ‹
             </button>
           )}
 
-          {/* Image */}
-          <div
-            className="relative w-full h-full max-w-4xl mx-auto"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={sortedImages[selectedImage].url}
-              alt={product.name}
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority
-            />
+          <div className="absolute inset-0 z-[101] flex items-center justify-center pointer-events-none pt-14 pb-16 px-4">
+            <div
+              className="pointer-events-auto relative h-[min(85dvh,100svh-7rem)] w-full max-w-[min(100%-1rem,1152px)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Image
+                src={sortedImages[selectedImage].url}
+                alt={product.name}
+                fill
+                className="object-contain"
+                sizes="100vw"
+                quality={92}
+                priority
+              />
+            </div>
           </div>
 
-          {/* Next */}
           {selectedImage < sortedImages.length - 1 && (
             <button
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-white text-[20px] opacity-50 hover:opacity-100 transition-opacity px-4 py-2"
-              onClick={(e) => { e.stopPropagation(); setSelectedImage((i) => i + 1); }}
+              type="button"
+              className="absolute right-[max(0.75rem,env(safe-area-inset-right))] top-1/2 -translate-y-1/2 z-[110] min-h-11 min-w-11 flex items-center justify-center text-white text-[22px] leading-none opacity-80 hover:opacity-100 bg-white/10 rounded-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                setSelectedImage((i) => i + 1);
+              }}
+              aria-label="Next image"
             >
               ›
             </button>
           )}
 
-          {/* Counter */}
           {sortedImages.length > 1 && (
-            <p className="absolute bottom-5 left-1/2 -translate-x-1/2 text-white/40 text-[10px] uppercase tracking-widest">
+            <p className="absolute bottom-[max(1rem,env(safe-area-inset-bottom))] left-1/2 -translate-x-1/2 z-[110] text-white/50 text-[10px] uppercase tracking-widest pointer-events-none">
               {selectedImage + 1} / {sortedImages.length}
             </p>
           )}
