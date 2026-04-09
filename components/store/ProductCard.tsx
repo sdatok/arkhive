@@ -4,9 +4,11 @@ import type { Product } from "@/types";
 
 interface ProductCardProps {
   product: Product;
+  /** Smaller type + image hints for narrow grids (e.g. “You may also like”). */
+  compact?: boolean;
 }
 
-export default function ProductCard({ product }: ProductCardProps) {
+export default function ProductCard({ product, compact }: ProductCardProps) {
   const primaryImage = product.images.sort(
     (a, b) => a.displayOrder - b.displayOrder
   )[0];
@@ -25,7 +27,11 @@ export default function ProductCard({ product }: ProductCardProps) {
               alt={product.name}
               fill
               className="object-cover transition-opacity duration-300 group-hover:opacity-0"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+              sizes={
+                compact
+                  ? "(max-width: 640px) 40vw, 220px"
+                  : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+              }
             />
             {secondaryImage && (
               <Image
@@ -33,7 +39,11 @@ export default function ProductCard({ product }: ProductCardProps) {
                 alt={product.name}
                 fill
                 className="object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+                sizes={
+                  compact
+                    ? "(max-width: 640px) 40vw, 220px"
+                    : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 22vw"
+                }
               />
             )}
           </>
@@ -51,14 +61,30 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       {/* Info — visible on hover on desktop, always on mobile */}
-      <div className="mt-2 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200">
-        <p className="text-[10px] uppercase tracking-widest text-neutral-400">
+      <div
+        className={
+          compact
+            ? "mt-1.5"
+            : "mt-2 md:opacity-0 md:group-hover:opacity-100 md:transition-opacity md:duration-200"
+        }
+      >
+        <p
+          className={`uppercase tracking-widest text-neutral-400 ${
+            compact ? "text-[9px]" : "text-[10px]"
+          }`}
+        >
           {product.brand}
         </p>
-        <p className="text-[12px] font-medium mt-0.5 leading-snug">
+        <p
+          className={`font-medium mt-0.5 leading-snug ${
+            compact ? "text-[11px]" : "text-[12px]"
+          }`}
+        >
           {product.name}
         </p>
-        <p className="text-[12px] mt-0.5">${Number(product.price).toFixed(2)}</p>
+        <p className={`mt-0.5 ${compact ? "text-[11px]" : "text-[12px]"}`}>
+          ${Number(product.price).toFixed(2)}
+        </p>
       </div>
     </Link>
   );

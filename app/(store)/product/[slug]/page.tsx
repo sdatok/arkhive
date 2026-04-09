@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import ProductDetail from "@/components/store/ProductDetail";
-import ProductGrid from "@/components/store/ProductGrid";
+import RelatedProductsStrip from "@/components/store/RelatedProductsStrip";
 import type { Product } from "@/types";
 import type { Metadata } from "next";
 
@@ -77,16 +77,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
     <div>
       <ProductDetail product={product} />
 
-      {related.length > 0 && (
-        <section className="border-t border-neutral-200 mt-12">
-          <div className="max-w-[1400px] mx-auto px-4 py-8">
-            <h2 className="text-[11px] uppercase tracking-widest font-bold mb-6">
-              You May Also Like
-            </h2>
-          </div>
-          <ProductGrid products={related} />
-        </section>
-      )}
+      <RelatedProductsStrip products={related} />
     </div>
   );
 }

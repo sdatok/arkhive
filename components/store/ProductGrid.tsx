@@ -3,7 +3,7 @@ import type { Product } from "@/types";
 
 interface ProductGridProps {
   products: Product[];
-  columns?: 2 | 3 | 4 | 5;
+  columns?: 2 | 3 | 5;
 }
 
 export default function ProductGrid({
@@ -13,7 +13,6 @@ export default function ProductGrid({
   const gridCols = {
     2: "grid-cols-2",
     3: "grid-cols-2 md:grid-cols-3",
-    4: "grid-cols-2 md:grid-cols-3 lg:grid-cols-4",
     5: "grid-cols-2 sm:grid-cols-3 lg:grid-cols-5",
   };
 

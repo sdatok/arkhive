@@ -69,7 +69,7 @@ export default async function HomePage() {
               View All
             </Link>
           </div>
-          <ProductGrid products={featured} />
+          <ProductGrid products={featured} columns={5} />
         </section>
       )}
 
