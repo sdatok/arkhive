@@ -1,6 +1,8 @@
 import { prisma } from "@/lib/db";
 import SubmissionsTable from "@/components/admin/SubmissionsTable";
 
+export const dynamic = "force-dynamic";
+
 async function getSubmissions() {
   try {
     return await prisma.submission.findMany({

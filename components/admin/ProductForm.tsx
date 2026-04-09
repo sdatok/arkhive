@@ -158,8 +158,10 @@ export default function ProductForm({
       });
 
       if (res.ok) {
-        router.push("/admin");
-        router.refresh();
+        // Full navigation avoids stale prerendered /admin RSC payload (router.refresh
+        // can run before the route swap and still show an old product list).
+        window.location.assign("/admin");
+        return;
       } else {
         const data = await res.json();
         setError(data.error ?? "Failed to save product");

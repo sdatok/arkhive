@@ -2,6 +2,8 @@ import Link from "next/link";
 import { prisma } from "@/lib/db";
 import AdminProductTable from "@/components/admin/AdminProductTable";
 
+export const dynamic = "force-dynamic";
+
 async function getAllProducts() {
   try {
     const products = await prisma.product.findMany({

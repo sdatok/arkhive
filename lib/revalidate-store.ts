@@ -10,4 +10,6 @@ export function revalidateProductPages(slug: string | null): void {
   if (slug) {
     revalidatePath(`/product/${slug}`);
   }
+  // Admin lists and forms read from DB — bust cache so new/edited products show at once
+  revalidatePath("/admin", "layout");
 }

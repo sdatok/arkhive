@@ -3,6 +3,8 @@ import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
 import { revalidateProductPages } from "@/lib/revalidate-store";
 
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const products = await prisma.product.findMany({
