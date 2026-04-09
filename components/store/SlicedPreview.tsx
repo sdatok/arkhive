@@ -36,14 +36,20 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
     .slice(0, MAX_SLICES);
 
   const basePercent = 100 / slices.length;
-  const expandedPercent = basePercent * 2.5;
+  /** Desktop hover: modest grow. Touch: larger expanded slice so title/price fit. */
+  const expandMult = touchPrimary ? 4.25 : 2.5;
+  const expandedPercent = basePercent * expandMult;
 
   if (slices.length === 0) return null;
+
+  const touchHasExpanded = touchPrimary && touchExpandedIdx !== null;
 
   return (
     <section className="border-b border-neutral-200 overflow-hidden">
       <div
-        className="flex h-[420px] md:h-[560px]"
+        className={`flex md:h-[560px] transition-[height] duration-500 ease-out ${
+          touchHasExpanded ? "h-[480px]" : "h-[420px]"
+        }`}
         onMouseLeave={() => {
           if (!touchPrimary) setHoveredIdx(null);
         }}
@@ -53,7 +59,7 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
           const isActive = activeIdx === idx;
           const isIdle = activeIdx === null;
 
-          const hoveredPercent = basePercent * 2.5;
+          const hoveredPercent = basePercent * expandMult;
           const otherPercent =
             slices.length > 1
               ? (100 - hoveredPercent) / (slices.length - 1)
@@ -104,42 +110,56 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
                 />
               </div>
 
-              <div
-                className={`absolute inset-0 bg-black transition-opacity duration-500 ${
-                  isActive ? "opacity-0" : "opacity-30"
-                }`}
-              />
-
               {idx < slices.length - 1 && (
                 <div className="absolute top-0 right-0 bottom-0 w-px bg-white/30 z-10" />
               )}
 
               <div
-                className={`absolute bottom-0 left-0 right-0 p-4 md:p-5 transition-all duration-300 ${
+                className={`absolute bottom-0 left-0 right-0 p-3 sm:p-4 md:p-5 transition-all duration-300 ${
                   isActive
                     ? "opacity-100 translate-y-0"
-                    : "opacity-0 translate-y-2"
+                    : "opacity-0 translate-y-2 pointer-events-none"
                 }`}
               >
-                <div className="bg-white/95 backdrop-blur-sm p-3">
-                  <p className="text-[9px] uppercase tracking-widest text-neutral-400 truncate">
+                <div
+                  className={`bg-white/95 backdrop-blur-sm shadow-sm border border-neutral-200/80 ${
+                    touchPrimary && isActive ? "p-3.5" : "p-3"
+                  }`}
+                >
+                  <p
+                    className={`uppercase tracking-widest text-neutral-400 truncate ${
+                      touchPrimary && isActive
+                        ? "text-[10px]"
+                        : "text-[9px] md:text-[9px]"
+                    }`}
+                  >
                     {product.brand}
                   </p>
-                  <p className="text-[12px] font-semibold leading-tight mt-0.5 truncate">
+                  <p
+                    className={`font-semibold leading-tight mt-0.5 line-clamp-2 ${
+                      touchPrimary && isActive
+                        ? "text-[13px]"
+                        : "text-[12px]"
+                    }`}
+                  >
                     {product.name}
                   </p>
-                  <p className="text-[12px] mt-1">
+                  <p
+                    className={`mt-1 font-medium ${
+                      touchPrimary && isActive ? "text-[14px]" : "text-[12px]"
+                    }`}
+                  >
                     ${Number(product.price).toFixed(2)}
                   </p>
                 </div>
               </div>
 
               <div
-                className={`absolute top-4 left-0 right-0 flex justify-center transition-opacity duration-300 ${
-                  isIdle ? "opacity-60" : "opacity-0"
+                className={`absolute top-3 md:top-4 left-0 right-0 flex justify-center transition-opacity duration-300 ${
+                  isIdle ? "opacity-90" : "opacity-0"
                 }`}
               >
-                <span className="text-[9px] uppercase tracking-[0.2em] text-white font-medium">
+                <span className="text-[9px] uppercase tracking-[0.2em] font-medium px-2 py-1 rounded-sm bg-black/35 text-white backdrop-blur-[2px]">
                   {String(idx + 1).padStart(2, "0")}
                 </span>
               </div>
