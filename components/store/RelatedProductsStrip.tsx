@@ -15,7 +15,7 @@ export default function RelatedProductsStrip({
 
   return (
     <section className="border-t border-neutral-200 mt-20 md:mt-28 pt-10 md:pt-14 pb-12 md:pb-16">
-      <div className="max-w-4xl mx-auto px-6 sm:px-10 md:px-14">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
         <h2 className="text-[11px] uppercase tracking-widest font-bold mb-8">
           You May Also Like
         </h2>

@@ -59,9 +59,10 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 pb-12 md:pb-16">
-      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,400px)_minmax(0,1fr)] gap-8 lg:gap-14 items-start">
+      {/* Desktop: fixed-ish two columns, centered — keeps buy box from stretching edge-to-edge */}
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,420px)_minmax(0,340px)] md:max-w-[880px] lg:max-w-[920px] md:mx-auto gap-8 lg:gap-12 items-start">
         {/* Images — capped width so photos aren’t upscaled on large screens */}
-        <div className="flex gap-3 w-full max-w-[400px] md:max-w-[440px] mx-auto md:mx-0">
+        <div className="flex gap-3 w-full max-w-[400px] md:max-w-[420px] mx-auto md:mx-0">
           {/* Thumbnails */}
           {sortedImages.length > 1 && (
             <div className="flex flex-col gap-2 w-14 shrink-0">
@@ -98,7 +99,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 alt={product.name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 440px"
+                sizes="(max-width: 768px) 100vw, 420px"
                 quality={90}
                 priority
               />
@@ -120,8 +121,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </div>
         </div>
 
-        {/* Product info */}
-        <div className="flex flex-col">
+        {/* Product info — narrow column on desktop so CTA isn’t ultra-wide */}
+        <div className="flex flex-col w-full max-w-[400px] md:max-w-none mx-auto md:mx-0">
           <p className="text-[11px] uppercase tracking-widest text-neutral-400">
             {product.brand}
           </p>
