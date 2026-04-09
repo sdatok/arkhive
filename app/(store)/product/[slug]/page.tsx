@@ -84,7 +84,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
               You May Also Like
             </h2>
           </div>
-          <ProductGrid products={related} columns={4} />
+          <ProductGrid products={related} />
         </section>
       )}
     </div>

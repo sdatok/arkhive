@@ -59,12 +59,12 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
-        {/* Images */}
-        <div className="flex gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-[minmax(0,400px)_minmax(0,1fr)] gap-8 lg:gap-14 items-start">
+        {/* Images — capped width so photos aren’t upscaled on large screens */}
+        <div className="flex gap-3 w-full max-w-[400px] md:max-w-[440px] mx-auto md:mx-0">
           {/* Thumbnails */}
           {sortedImages.length > 1 && (
-            <div className="flex flex-col gap-2 w-16">
+            <div className="flex flex-col gap-2 w-14 shrink-0">
               {sortedImages.map((img, idx) => (
                 <button
                   key={img.id}
@@ -80,7 +80,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                     alt={`${product.name} ${idx + 1}`}
                     fill
                     className="object-cover"
-                    sizes="64px"
+                    sizes="56px"
                   />
                 </button>
               ))}
@@ -89,7 +89,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Main image */}
           <div
-            className="relative flex-1 aspect-[3/4] bg-neutral-100 cursor-zoom-in"
+            className="relative flex-1 min-w-0 aspect-[3/4] bg-neutral-100 cursor-zoom-in"
             onClick={() => sortedImages[selectedImage] && setLightboxOpen(true)}
           >
             {sortedImages[selectedImage] ? (
@@ -98,7 +98,8 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 alt={product.name}
                 fill
                 className="object-cover"
-                sizes="(max-width: 768px) 100vw, 50vw"
+                sizes="(max-width: 768px) 100vw, 440px"
+                quality={90}
                 priority
               />
             ) : (

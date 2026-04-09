@@ -96,7 +96,7 @@ export default async function ShopPage({ searchParams }: ShopPageProps) {
         />
 
         {/* Grid */}
-        <ProductGrid products={products} columns={4} />
+        <ProductGrid products={products} />
       </div>
     </div>
   );
