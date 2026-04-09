@@ -18,7 +18,8 @@ async function getAllProducts() {
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));
-  } catch {
+  } catch (err) {
+    console.error("[getAllProducts admin]", err);
     return [];
   }
 }

@@ -34,7 +34,8 @@ async function getFeaturedProducts(): Promise<Product[]> {
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));
-  } catch {
+  } catch (err) {
+    console.error("[getFeaturedProducts]", err);
     return [];
   }
 }

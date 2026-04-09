@@ -57,7 +57,8 @@ async function getProducts(filters: {
       })),
       brands: allBrands.map((b) => b.brand),
     };
-  } catch {
+  } catch (err) {
+    console.error("[getProducts shop]", err);
     return { products: [], brands: [] };
   }
 }

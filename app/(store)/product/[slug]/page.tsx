@@ -24,7 +24,8 @@ async function getProduct(slug: string): Promise<Product | null> {
       createdAt: product.createdAt.toISOString(),
       updatedAt: product.updatedAt.toISOString(),
     };
-  } catch {
+  } catch (err) {
+    console.error("[getProduct]", err);
     return null;
   }
 }
@@ -48,7 +49,8 @@ async function getRelated(
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));
-  } catch {
+  } catch (err) {
+    console.error("[getRelated]", err);
     return [];
   }
 }
