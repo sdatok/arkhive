@@ -53,7 +53,7 @@ const submissions = [
     phone: "778-555-0234",
     itemName: "Stone Island Shadow Project Hooded Jacket",
     brand: "Stone Island",
-    description: "SS20 Stone Island Shadow Project, size XL. The one with the articulated sleeve. Paid $1100 CAD. A small mark on the inner lining not visible when worn — priced accordingly. No badge issues.",
+    description: "SS20 Stone Island Shadow Project, size XL. The one with the articulated sleeve. Paid $1100 USD. A small mark on the inner lining not visible when worn — priced accordingly. No badge issues.",
     askingPrice: 550,
     condition: "Good",
     imageUrls: [],

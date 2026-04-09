@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import ProductGrid from "@/components/store/ProductGrid";
 import SlicedPreview from "@/components/store/SlicedPreview";
 import Reviews from "@/components/store/Reviews";
+import StoreFaq from "@/components/store/StoreFaq";
 import HeroSection from "@/components/store/HeroSection";
 import BrandShowcase from "@/components/store/BrandShowcase";
 import type { Product } from "@/types";
@@ -82,6 +83,8 @@ export default async function HomePage() {
           </p>
         </section>
       )}
+
+      <StoreFaq />
 
       {/* Reviews */}
       <Reviews />

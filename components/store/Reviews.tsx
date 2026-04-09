@@ -6,7 +6,7 @@ const REVIEWS = [
   {
     id: 1,
     name: "Jordan M.",
-    location: "Toronto, CA",
+    location: "Los Angeles, CA",
     rating: 5,
     date: "March 2025",
     item: "Arc'teryx Beta AR Jacket",
@@ -33,16 +33,16 @@ const REVIEWS = [
   {
     id: 4,
     name: "Camille R.",
-    location: "Montreal, CA",
+    location: "Chicago, IL",
     rating: 5,
     date: "March 2025",
     item: "Supreme Box Logo Crewneck",
-    text: "They authenticated everything properly and the listing photos were spot on. Bought with zero hesitation. This is the spot for streetwear in Canada.",
+    text: "They authenticated everything properly and the listing photos were spot on. Bought with zero hesitation — exactly the level of trust you want when shopping resale.",
   },
   {
     id: 5,
     name: "Ethan K.",
-    location: "Vancouver, CA",
+    location: "Miami, FL",
     rating: 5,
     date: "April 2025",
     item: "Fear of God Essentials Pants",
