@@ -67,7 +67,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   }
 
   return (
-    <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 pb-12 md:pb-16">
+    <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 pb-12 md:pb-16 bg-white">
       {/* Desktop: fixed-ish two columns, centered — keeps buy box from stretching edge-to-edge */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,480px)_minmax(0,340px)] md:max-w-[960px] lg:max-w-[1000px] md:mx-auto gap-8 lg:gap-12 items-start">
         {/* Images — wider slot + contain so wide shots aren’t cropped at the sides */}
@@ -99,7 +99,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
           {/* Main image */}
           <div
-            className="relative flex-1 min-w-0 aspect-[3/4] max-h-[min(88vh,620px)] md:max-h-none bg-neutral-100 cursor-zoom-in"
+            className="relative flex-1 min-w-0 aspect-[3/4] max-h-[min(88vh,620px)] md:max-h-none bg-white cursor-zoom-in"
             onClick={() => sortedImages[selectedImage] && setLightboxOpen(true)}
           >
             {sortedImages[selectedImage] ? (
@@ -113,7 +113,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 priority
               />
             ) : (
-              <div className="w-full h-full bg-neutral-200 flex items-center justify-center">
+              <div className="w-full h-full bg-white flex items-center justify-center">
                 <span className="text-[11px] uppercase tracking-widest text-neutral-400">
                   No Image
                 </span>
