@@ -19,7 +19,7 @@ export default function RelatedProductsStrip({
         <h2 className="text-[11px] uppercase tracking-widest font-bold mb-8">
           You May Also Like
         </h2>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-neutral-200">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white">
           {products.map((product) => (
             <div key={product.id} className="bg-white p-2 md:p-2.5">
               <ProductCard product={product} compact />

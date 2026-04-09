@@ -91,9 +91,9 @@ export default function Reviews() {
         </div>
 
         {/* Cards — horizontal scroll on mobile, grid on desktop */}
-        <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-px bg-neutral-200">
+        <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-px bg-white">
           {visible.map((review) => (
-            <div key={review.id} className="bg-white p-5 flex flex-col gap-3">
+            <div key={review.id} className="flex flex-col gap-3 bg-white p-5">
               <Stars count={review.rating} />
               <p className="text-[12px] leading-relaxed text-neutral-700 flex-1">
                 "{review.text}"

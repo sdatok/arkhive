@@ -9,6 +9,9 @@ import HeroSection from "@/components/store/HeroSection";
 import BrandShowcase from "@/components/store/BrandShowcase";
 import type { Product } from "@/types";
 
+/** Homepage New Arrivals: max 3 rows at lg (5 columns). */
+const NEW_ARRIVALS_GRID_MAX = 15;
+
 /** Fisher–Yates shuffle — new array, original order unchanged */
 function shuffleArray<T>(items: T[]): T[] {
   const a = [...items];
@@ -19,15 +22,21 @@ function shuffleArray<T>(items: T[]): T[] {
   return a;
 }
 
-async function getFeaturedProducts(): Promise<Product[]> {
+async function getHomepageProducts(): Promise<{
+  featured: Product[];
+  activeProductCount: number;
+}> {
   try {
-    const products = await prisma.product.findMany({
-      where: { status: "ACTIVE" },
-      include: { images: { orderBy: { displayOrder: "asc" } } },
-      orderBy: { createdAt: "desc" },
-      take: 16,
-    });
-    return products.map((p) => ({
+    const [products, activeProductCount] = await Promise.all([
+      prisma.product.findMany({
+        where: { status: "ACTIVE" },
+        include: { images: { orderBy: { displayOrder: "asc" } } },
+        orderBy: { createdAt: "desc" },
+        take: 24,
+      }),
+      prisma.product.count({ where: { status: "ACTIVE" } }),
+    ]);
+    const featured: Product[] = products.map((p) => ({
       ...p,
       price: Number(p.price),
       sizePricing: p.sizePricing as Record<string, number> | null,
@@ -35,15 +44,17 @@ async function getFeaturedProducts(): Promise<Product[]> {
       createdAt: p.createdAt.toISOString(),
       updatedAt: p.updatedAt.toISOString(),
     }));
+    return { featured, activeProductCount };
   } catch (err) {
-    console.error("[getFeaturedProducts]", err);
-    return [];
+    console.error("[getHomepageProducts]", err);
+    return { featured: [], activeProductCount: 0 };
   }
 }
 
 export default async function HomePage() {
   unstable_noStore();
-  const featured = await getFeaturedProducts();
+  const { featured, activeProductCount } = await getHomepageProducts();
+  const hasMoreNewArrivals = activeProductCount > NEW_ARRIVALS_GRID_MAX;
   const sliceProducts = shuffleArray(
     featured.filter((p) => p.images.length > 0)
   );
@@ -58,7 +69,7 @@ export default async function HomePage() {
       {/* Shop by Brand */}
       <BrandShowcase />
 
-      {/* New Arrivals grid */}
+      {/* New Arrivals grid — capped so FAQ / reviews are easier to reach */}
       {featured.length > 0 && (
         <section className="mt-0">
           <div className="max-w-[1400px] mx-auto px-4 py-8 flex items-center justify-between">
@@ -69,10 +80,24 @@ export default async function HomePage() {
               href="/shop"
               className="text-[11px] uppercase tracking-widest text-neutral-500 hover:text-black transition-colors"
             >
-              View All
+              View all
             </Link>
           </div>
-          <ProductGrid products={featured} columns={5} />
+          <ProductGrid
+            products={featured}
+            columns={5}
+            maxItems={NEW_ARRIVALS_GRID_MAX}
+          />
+          {hasMoreNewArrivals && (
+            <div className="max-w-[1400px] mx-auto px-4 pt-6 pb-4 text-center">
+              <Link
+                href="/shop"
+                className="inline-block text-[11px] uppercase tracking-widest text-neutral-500 hover:text-black transition-colors border-b border-neutral-300 hover:border-black pb-0.5"
+              >
+                See more new arrivals
+              </Link>
+            </div>
+          )}
         </section>
       )}
 
