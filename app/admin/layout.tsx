@@ -36,6 +36,12 @@ export default function AdminLayout({
                 Submissions
               </Link>
               <Link
+                href="/admin/wtf"
+                className="text-[10px] uppercase tracking-widest text-neutral-400 hover:text-white transition-colors"
+              >
+                WTF
+              </Link>
+              <Link
                 href="/"
                 target="_blank"
                 className="text-[10px] uppercase tracking-widest text-neutral-400 hover:text-white transition-colors"

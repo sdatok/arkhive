@@ -20,7 +20,8 @@ export async function GET(
   const pathname = segments.join("/");
   if (
     !pathname.startsWith("products/") &&
-    !pathname.startsWith("submissions/")
+    !pathname.startsWith("submissions/") &&
+    !pathname.startsWith("wtf/")
   ) {
     return NextResponse.json({ error: "Invalid path" }, { status: 400 });
   }

@@ -30,10 +30,10 @@ export default function Header() {
               Shop
             </Link>
             <Link
-              href="/shop?category=New+Arrivals"
+              href="/whats-the-fit"
               className="text-black text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
             >
-              New
+              WTF
             </Link>
             <Link
               href="/sell"
@@ -77,11 +77,11 @@ export default function Header() {
                 Shop
               </Link>
               <Link
-                href="/shop?category=New+Arrivals"
+                href="/whats-the-fit"
                 className="text-[11px] uppercase tracking-widest font-medium"
                 onClick={() => setMenuOpen(false)}
               >
-                New
+                WTF
               </Link>
               <Link
                 href="/sell"

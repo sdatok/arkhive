@@ -17,7 +17,7 @@ export function blobPutAccess(): "private" | "public" {
   return "public";
 }
 
-type Folder = "products" | "submissions";
+export type UploadFolder = "products" | "submissions" | "wtf";
 
 export type SaveUploadResult =
   | { ok: true; url: string }
@@ -32,7 +32,7 @@ export type SaveUploadResult =
  */
 export async function saveUploadedImage(
   file: File,
-  folder: Folder
+  folder: UploadFolder
 ): Promise<SaveUploadResult> {
   const safeName = `${Date.now()}-${file.name.replace(/[^a-z0-9.\-_]/gi, "-")}`;
   const pathname = `${folder}/${safeName}`;

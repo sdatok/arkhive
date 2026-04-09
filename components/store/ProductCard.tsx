@@ -9,12 +9,11 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, compact }: ProductCardProps) {
-  const primaryImage = product.images.sort(
+  const sorted = [...product.images].sort(
     (a, b) => a.displayOrder - b.displayOrder
-  )[0];
-  const secondaryImage = product.images.sort(
-    (a, b) => a.displayOrder - b.displayOrder
-  )[1];
+  );
+  const primaryImage = sorted[0];
+  const secondaryImage = sorted[1];
 
   return (
     <Link href={`/product/${product.slug}`} className="group block">
@@ -26,7 +25,9 @@ export default function ProductCard({ product, compact }: ProductCardProps) {
               src={primaryImage.url}
               alt={product.name}
               fill
-              className="object-cover transition-opacity duration-300 group-hover:opacity-0"
+              className={`object-cover transition-opacity duration-300 ${
+                secondaryImage ? "group-hover:opacity-0" : ""
+              }`}
               sizes={
                 compact
                   ? "(max-width: 640px) 40vw, 220px"
