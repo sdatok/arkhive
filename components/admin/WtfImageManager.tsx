@@ -4,7 +4,12 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
-export type WtfImageRow = { id: string; url: string; displayOrder: number };
+export type WtfImageRow = {
+  id: string;
+  url: string;
+  displayOrder: number;
+  featured: boolean;
+};
 
 function imgUnoptimized(url: string) {
   return (
@@ -27,9 +32,10 @@ export default function WtfImageManager({
   const [dragOver, setDragOver] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
 
-  const images = [...initialImages].sort(
-    (a, b) => a.displayOrder - b.displayOrder
-  );
+  const images = [...initialImages].sort((a, b) => {
+    if (a.featured !== b.featured) return a.featured ? -1 : 1;
+    return a.displayOrder - b.displayOrder;
+  });
 
   async function uploadFiles(files: File[]) {
     setUploading(true);
@@ -86,6 +92,27 @@ export default function WtfImageManager({
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
         setUploadError(d.error ?? "Delete failed");
+        return;
+      }
+      router.refresh();
+    } finally {
+      setBusyId(null);
+    }
+  }
+
+  async function setFeatured(id: string, featured: boolean) {
+    setBusyId(id);
+    setUploadError(null);
+    try {
+      const res = await fetch("/api/admin/wtf-images", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, featured }),
+      });
+      if (!res.ok) {
+        const d = await res.json().catch(() => ({}));
+        setUploadError(d.error ?? "Could not update star");
         return;
       }
       router.refresh();
@@ -172,7 +199,7 @@ export default function WtfImageManager({
       )}
 
       {images.length > 0 && (
-        <div className="mt-6 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+        <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2">
           {images.map((img, idx) => (
             <div key={img.id} className="relative group">
               <div className="relative aspect-square bg-neutral-200 overflow-hidden rounded">
@@ -181,51 +208,127 @@ export default function WtfImageManager({
                   alt=""
                   fill
                   className="object-cover"
-                  sizes="120px"
+                  sizes="(max-width: 640px) 45vw, 120px"
                   unoptimized={imgUnoptimized(img.url)}
                 />
-              </div>
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded flex items-center justify-center gap-1">
-                {idx > 0 && (
+
+                {/* Mobile / touch: always-visible bar (hover doesn’t exist on phones) */}
+                <div
+                  className="md:hidden absolute inset-x-0 bottom-0 z-20 flex items-stretch border-t border-white/15 bg-black/75 backdrop-blur-[2px]"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    type="button"
+                    disabled={busyId !== null}
+                    onClick={() => setFeatured(img.id, !img.featured)}
+                    className={`touch-manipulation flex min-h-11 min-w-11 flex-1 items-center justify-center text-lg leading-none active:bg-white/10 disabled:opacity-50 ${
+                      img.featured ? "text-amber-300" : "text-white/80"
+                    }`}
+                    aria-pressed={img.featured}
+                    aria-label={
+                      img.featured ? "Remove favourite" : "Favourite — show near top on site"
+                    }
+                  >
+                    {img.featured ? "★" : "☆"}
+                  </button>
+                  {idx > 0 && (
+                    <button
+                      type="button"
+                      disabled={busyId !== null}
+                      onClick={() => reorder(idx, idx - 1)}
+                      className="touch-manipulation flex min-h-11 min-w-11 flex-1 items-center justify-center text-white text-sm active:bg-white/10 disabled:opacity-50 border-l border-white/15"
+                      aria-label="Move earlier in list"
+                    >
+                      ←
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    disabled={busyId !== null}
+                    onClick={() => remove(img.id)}
+                    className="touch-manipulation flex min-h-11 min-w-11 flex-1 items-center justify-center text-red-300 text-lg active:bg-white/10 disabled:opacity-50 border-l border-white/15"
+                    aria-label="Delete image"
+                  >
+                    ×
+                  </button>
+                  {idx < images.length - 1 && (
+                    <button
+                      type="button"
+                      disabled={busyId !== null}
+                      onClick={() => reorder(idx, idx + 1)}
+                      className="touch-manipulation flex min-h-11 min-w-11 flex-1 items-center justify-center text-white text-sm active:bg-white/10 disabled:opacity-50 border-l border-white/15"
+                      aria-label="Move later in list"
+                    >
+                      →
+                    </button>
+                  )}
+                </div>
+
+                {/* Desktop: hover overlay for reorder / delete */}
+                <div className="pointer-events-none absolute inset-0 hidden opacity-0 transition-opacity group-hover:pointer-events-auto group-hover:opacity-100 md:flex md:items-center md:justify-center md:gap-1 md:bg-black/40 md:rounded">
+                  {idx > 0 && (
+                    <button
+                      type="button"
+                      disabled={busyId !== null}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        reorder(idx, idx - 1);
+                      }}
+                      className="h-8 w-8 bg-white text-black text-[11px] flex items-center justify-center rounded disabled:opacity-50"
+                      title="Earlier in admin list"
+                    >
+                      ←
+                    </button>
+                  )}
                   <button
                     type="button"
                     disabled={busyId !== null}
                     onClick={(e) => {
                       e.stopPropagation();
-                      reorder(idx, idx - 1);
+                      remove(img.id);
                     }}
-                    className="w-6 h-6 bg-white text-black text-[11px] flex items-center justify-center rounded disabled:opacity-50"
-                    title="Earlier"
+                    className="h-8 w-8 bg-white text-red-500 text-[11px] flex items-center justify-center rounded disabled:opacity-50"
+                    title="Remove"
                   >
-                    ←
+                    ×
                   </button>
-                )}
+                  {idx < images.length - 1 && (
+                    <button
+                      type="button"
+                      disabled={busyId !== null}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        reorder(idx, idx + 1);
+                      }}
+                      className="h-8 w-8 bg-white text-black text-[11px] flex items-center justify-center rounded disabled:opacity-50"
+                      title="Later in admin list"
+                    >
+                      →
+                    </button>
+                  )}
+                </div>
+
+                {/* Desktop: star on corner (44px touch-friendly if using tablet with hover) */}
                 <button
                   type="button"
                   disabled={busyId !== null}
                   onClick={(e) => {
                     e.stopPropagation();
-                    remove(img.id);
+                    setFeatured(img.id, !img.featured);
                   }}
-                  className="w-6 h-6 bg-white text-red-500 text-[11px] flex items-center justify-center rounded disabled:opacity-50"
-                  title="Remove"
+                  className={`absolute bottom-2 left-2 z-30 hidden h-11 w-11 md:flex items-center justify-center rounded-lg border text-lg leading-none shadow-md transition-colors disabled:opacity-50 touch-manipulation ${
+                    img.featured
+                      ? "border-amber-400 bg-amber-100 text-amber-900"
+                      : "border-neutral-200/90 bg-white/95 text-neutral-500 hover:border-neutral-400 hover:text-neutral-900"
+                  }`}
+                  title={img.featured ? "Remove from favourites" : "Favourite (shuffle near top)"}
+                  aria-pressed={img.featured}
+                  aria-label={
+                    img.featured ? "Remove favourite" : "Favourite — show near top on site"
+                  }
                 >
-                  ×
+                  {img.featured ? "★" : "☆"}
                 </button>
-                {idx < images.length - 1 && (
-                  <button
-                    type="button"
-                    disabled={busyId !== null}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      reorder(idx, idx + 1);
-                    }}
-                    className="w-6 h-6 bg-white text-black text-[11px] flex items-center justify-center rounded disabled:opacity-50"
-                    title="Later"
-                  >
-                    →
-                  </button>
-                )}
               </div>
             </div>
           ))}

@@ -12,8 +12,8 @@ export default async function AdminWtfPage() {
     <div>
       <div className="mb-8">
         <h1 className="text-[18px] font-bold">What&apos;s The Fit</h1>
-        <p className="text-[12px] text-neutral-500 mt-0.5">
-          Upload images for the public{" "}
+        <p className="text-[12px] text-neutral-500 mt-0.5 max-w-2xl">
+          Upload community fit pics for the public{" "}
           <a
             href="/whats-the-fit"
             target="_blank"
@@ -22,8 +22,8 @@ export default async function AdminWtfPage() {
           >
             WTF
           </a>{" "}
-          page. They appear in a loose column layout (newest additions at the end until you
-          reorder).
+          page. Order below is for your reference; the live page shuffles on every visit.
+          Star favourites — they stay random but tend to appear near the top.
         </p>
       </div>
 
@@ -32,6 +32,7 @@ export default async function AdminWtfPage() {
           id: i.id,
           url: i.url,
           displayOrder: i.displayOrder,
+          featured: i.featured,
         }))}
       />
     </div>

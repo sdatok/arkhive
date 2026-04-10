@@ -37,6 +37,7 @@ export async function POST(request: Request) {
     id: row.id,
     url: row.url,
     displayOrder: row.displayOrder,
+    featured: row.featured,
   });
 }
 
@@ -45,11 +46,35 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  let body: { orderedIds?: unknown };
+  let body: { orderedIds?: unknown; id?: unknown; featured?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  if (body.id !== undefined || body.featured !== undefined) {
+    if (typeof body.id !== "string" || typeof body.featured !== "boolean") {
+      return NextResponse.json(
+        { error: "For featured toggle, send { id: string, featured: boolean }" },
+        { status: 400 }
+      );
+    }
+    if (body.orderedIds !== undefined) {
+      return NextResponse.json(
+        { error: "Send either orderedIds or id+featured, not both" },
+        { status: 400 }
+      );
+    }
+    const updated = await prisma.wtfImage.updateMany({
+      where: { id: body.id },
+      data: { featured: body.featured },
+    });
+    if (updated.count === 0) {
+      return NextResponse.json({ error: "Not found" }, { status: 404 });
+    }
+    revalidateWtfPage();
+    return NextResponse.json({ ok: true });
   }
 
   const orderedIds = body.orderedIds;

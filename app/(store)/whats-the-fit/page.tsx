@@ -1,16 +1,22 @@
 import { prisma } from "@/lib/db";
+import { shuffle } from "@/lib/shuffle";
 
 export const metadata = {
   title: "What's The Fit — ARKHIVE",
-  description: "Brands and references we love.",
+  description:
+    "Community-sourced fits and references — a living wall of how people are wearing it.",
 };
 
 export const dynamic = "force-dynamic";
 
 export default async function WhatsTheFitPage() {
-  const images = await prisma.wtfImage.findMany({
+  const rows = await prisma.wtfImage.findMany({
     orderBy: { displayOrder: "asc" },
   });
+
+  const featured = rows.filter((r) => r.featured);
+  const rest = rows.filter((r) => !r.featured);
+  const images = [...shuffle(featured), ...shuffle(rest)];
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-10 md:py-14">
@@ -21,8 +27,9 @@ export default async function WhatsTheFitPage() {
         <h1 className="text-[22px] md:text-[28px] font-black uppercase tracking-[0.12em]">
           What&apos;s The Fit
         </h1>
-        <p className="text-[12px] text-neutral-500 mt-3 max-w-md mx-auto leading-relaxed">
-          A running mood board — brands, energy, and images we&apos;re into right now.
+        <p className="text-[12px] text-neutral-500 mt-3 max-w-lg mx-auto leading-relaxed">
+          Fits, mirrors, and streets — submitted by the community and curated here. A
+          soft archive of how people are actually wearing things right now.
         </p>
       </header>
 
@@ -35,7 +42,7 @@ export default async function WhatsTheFitPage() {
           {images.map((img) => (
             <figure
               key={img.id}
-              className="break-inside-avoid mb-3 md:mb-4 overflow-hidden bg-neutral-100"
+              className="break-inside-avoid mb-3 md:mb-4 overflow-hidden bg-white"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

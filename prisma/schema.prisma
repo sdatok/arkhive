@@ -43,9 +43,11 @@ model WtfImage {
   id           String   @id @default(cuid())
   url          String
   displayOrder Int      @default(0)
+  featured     Boolean  @default(false)
   createdAt    DateTime @default(now())
 
   @@index([displayOrder])
+  @@index([featured])
 }
 
 model Order {
