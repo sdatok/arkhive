@@ -5,8 +5,9 @@ import Image from "next/image";
 import Link from "next/link";
 import type { Product } from "@/types";
 
-/** Most recent featured products shown in the slice strip (desktop + mobile). */
+/** Products fetched for the strip; desktop shows this many, mobile shows first 8 only. */
 const MAX_SLICES = 10;
+const MOBILE_VISIBLE_SLICES = 8;
 
 interface SlicedPreviewProps {
   products: Product[];
@@ -24,8 +25,22 @@ function useTouchPrimaryUi() {
   return touchPrimary;
 }
 
+/** Matches Tailwind `md:` (768px) so flex widths match how many slices are visible. */
+function useNarrowViewport() {
+  const [narrow, setNarrow] = useState(false);
+  useLayoutEffect(() => {
+    const mq = window.matchMedia("(max-width: 767px)");
+    const update = () => setNarrow(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
+  return narrow;
+}
+
 export default function SlicedPreview({ products }: SlicedPreviewProps) {
   const touchPrimary = useTouchPrimaryUi();
+  const narrowViewport = useNarrowViewport();
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [touchExpandedIdx, setTouchExpandedIdx] = useState<number | null>(null);
 
@@ -35,10 +50,12 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
     .filter((p) => p.images.length > 0)
     .slice(0, MAX_SLICES);
 
-  const basePercent = 100 / slices.length;
+  const sliceCountForLayout = narrowViewport
+    ? Math.min(MOBILE_VISIBLE_SLICES, slices.length)
+    : slices.length;
+  const basePercent = 100 / sliceCountForLayout;
   /** Desktop hover: modest grow. Touch: larger expanded slice so title/price fit. */
   const expandMult = touchPrimary ? 4.25 : 2.5;
-  const expandedPercent = basePercent * expandMult;
 
   if (slices.length === 0) return null;
 
@@ -61,12 +78,12 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
 
           const hoveredPercent = basePercent * expandMult;
           const otherPercent =
-            slices.length > 1
-              ? (100 - hoveredPercent) / (slices.length - 1)
+            sliceCountForLayout > 1
+              ? (100 - hoveredPercent) / (sliceCountForLayout - 1)
               : 100;
 
           const width =
-            slices.length === 1
+            sliceCountForLayout === 1
               ? "100%"
               : isIdle
                 ? `${basePercent}%`
@@ -74,13 +91,13 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
                   ? `${hoveredPercent}%`
                   : `${otherPercent}%`;
 
-          const imgWrapperWidth = `min(${expandedPercent}vw, ${(1400 * expandedPercent) / 100}px)`;
-
           return (
             <Link
               key={product.id}
               href={`/product/${product.slug}`}
-              className="relative flex-shrink-0 overflow-hidden group cursor-pointer"
+              className={`relative flex-shrink-0 overflow-hidden group cursor-pointer ${
+                idx >= MOBILE_VISIBLE_SLICES ? "max-md:hidden" : ""
+              }`}
               style={{
                 width,
                 transition: "width 0.5s cubic-bezier(0.4, 0, 0.2, 1)",
@@ -95,23 +112,24 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
                 }
               }}
             >
-              <div
-                className="absolute top-0 left-1/2 -translate-x-1/2 h-full"
-                style={{ width: imgWrapperWidth }}
-              >
+              <div className="absolute inset-0">
                 <Image
                   src={img.url}
                   alt={product.name}
                   fill
                   className="object-cover object-center"
                   quality={92}
-                  sizes="(max-width: 768px) 85vw, 45vw"
+                  sizes="(max-width: 768px) 20vw, 18vw"
                   priority={idx < 4}
                 />
               </div>
 
               {idx < slices.length - 1 && (
-                <div className="absolute top-0 right-0 bottom-0 w-px bg-white/30 z-10" />
+                <div
+                  className={`absolute top-0 right-0 bottom-0 w-px bg-white/30 z-10 ${
+                    idx === MOBILE_VISIBLE_SLICES - 1 ? "max-md:hidden" : ""
+                  }`}
+                />
               )}
 
               <div

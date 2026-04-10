@@ -17,7 +17,7 @@ export default async function WhatsTheFitPage() {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-10 md:py-14 bg-white">
-      <div className="max-w-2xl mb-10 md:mb-12">
+      <div className="max-w-2xl mx-auto mb-10 md:mb-12 text-center">
         <h1 className="text-[32px] md:text-[48px] font-black uppercase tracking-tight leading-none mb-3">
           WTF
         </h1>
