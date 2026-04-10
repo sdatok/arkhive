@@ -9,6 +9,10 @@ import type { Product } from "@/types";
 const MAX_SLICES = 10;
 const MOBILE_VISIBLE_SLICES = 8;
 
+/** next/image `sizes`: must reflect expanded slice width (~60% mobile, ~32% ≤1400px row). */
+const SLICE_IMAGE_SIZES =
+  "(max-width: 767px) 60vw, (max-width: 1400px) 32vw, 448px";
+
 interface SlicedPreviewProps {
   products: Product[];
 }
@@ -64,8 +68,8 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
   return (
     <section className="border-b border-neutral-200 overflow-hidden">
       <div
-        className={`flex md:h-[560px] transition-[height] duration-500 ease-out ${
-          touchHasExpanded ? "h-[480px]" : "h-[420px]"
+        className={`flex md:h-[440px] transition-[height] duration-500 ease-out ${
+          touchHasExpanded ? "h-[380px]" : "h-[340px]"
         }`}
         onMouseLeave={() => {
           if (!touchPrimary) setHoveredIdx(null);
@@ -118,8 +122,8 @@ export default function SlicedPreview({ products }: SlicedPreviewProps) {
                   alt={product.name}
                   fill
                   className="object-cover object-center"
-                  quality={92}
-                  sizes="(max-width: 768px) 20vw, 18vw"
+                  quality={95}
+                  sizes={SLICE_IMAGE_SIZES}
                   priority={idx < 4}
                 />
               </div>
