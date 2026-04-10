@@ -1,5 +1,6 @@
 import { CartProvider } from "@/context/CartContext";
-import StoreShell from "@/components/store/StoreShell";
+import Header from "@/components/store/Header";
+import Footer from "@/components/store/Footer";
 
 export default function StoreLayout({
   children,
@@ -8,7 +9,9 @@ export default function StoreLayout({
 }) {
   return (
     <CartProvider>
-      <StoreShell>{children}</StoreShell>
+      <Header />
+      <main className="pt-11">{children}</main>
+      <Footer />
     </CartProvider>
   );
 }
