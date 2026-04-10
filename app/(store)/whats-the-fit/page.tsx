@@ -17,6 +17,17 @@ export default async function WhatsTheFitPage() {
 
   return (
     <div className="max-w-[1200px] mx-auto px-4 py-10 md:py-14 bg-white">
+      <div className="max-w-2xl mb-10 md:mb-12">
+        <h1 className="text-[32px] md:text-[48px] font-black uppercase tracking-tight leading-none mb-3">
+          WTF
+        </h1>
+        <p className="text-[11px] uppercase tracking-widest text-neutral-400 mb-4">
+          What&apos;s The Fit?
+        </p>
+        <p className="text-[13px] text-neutral-500 leading-relaxed">
+          Community fit pics, curated at ARKHIVE.
+        </p>
+      </div>
       {images.length === 0 ? (
         <p className="text-center text-[12px] text-neutral-400 uppercase tracking-widest py-20">
           Coming soon.
