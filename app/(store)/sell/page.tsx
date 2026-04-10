@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import SellForm from "@/components/store/SellForm";
 
 export const metadata: Metadata = {
-  title: "Sell — ARKHIVE",
+  title: "Sell - ARKHIVE",
   description:
     "Sell or consign your designer, luxury, and streetwear pieces with ARKHIVE.",
 };
@@ -33,8 +33,8 @@ export default function SellPage() {
               We Buy
             </h3>
             <p className="text-[13px] text-neutral-500 leading-relaxed">
-              We purchase items outright. You get paid immediately — no waiting,
-              no commission. Best for pieces you want to move fast.
+              We purchase items outright. You get paid immediately, with no
+              waiting and no commission. Best for pieces you want to move fast.
             </p>
           </div>
 
@@ -49,26 +49,6 @@ export default function SellPage() {
             </p>
           </div>
 
-          <div className="border border-neutral-200 p-6">
-            <h3 className="text-[11px] uppercase tracking-widest font-bold mb-4">
-              What We Accept
-            </h3>
-            <ul className="text-[13px] text-neutral-500 space-y-1.5">
-              {[
-                "Designer streetwear (Supreme, Palace, etc.)",
-                "Luxury outerwear (Arc'teryx, Stone Island)",
-                "High fashion (Off-White, Fear of God)",
-                "Deadstock & limited releases",
-                "Luxury accessories & bags",
-                "Pre-owned & used pieces in good condition",
-              ].map((item) => (
-                <li key={item} className="flex items-start gap-2">
-                  <span className="mt-1 text-[10px]">—</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
         </div>
       </div>
     </div>

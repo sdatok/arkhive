@@ -28,7 +28,7 @@ const REVIEWS = [
     rating: 5,
     date: "January 2025",
     item: "Stone Island Shadow Project Hoodie",
-    text: "Sold a piece through ARKHIVE and the process was seamless. Got a fair offer, item was picked up same week. No nonsense — exactly what you want.",
+    text: "Sold a piece through ARKHIVE and the process was seamless. Got a fair offer, item was picked up same week. No nonsense, exactly what you want.",
   },
   {
     id: 4,
@@ -37,7 +37,7 @@ const REVIEWS = [
     rating: 5,
     date: "March 2025",
     item: "Supreme Box Logo Crewneck",
-    text: "They authenticated everything properly and the listing photos were spot on. Bought with zero hesitation — exactly the level of trust you want when shopping resale.",
+    text: "They authenticated everything properly and the listing photos were spot on. Bought with zero hesitation, exactly the level of trust you want when shopping resale.",
   },
   {
     id: 5,
@@ -46,7 +46,7 @@ const REVIEWS = [
     rating: 5,
     date: "April 2025",
     item: "Fear of God Essentials Pants",
-    text: "Clean site, easy to browse, fair prices. Got my order in two days. The item was exactly as described — really solid experience start to finish.",
+    text: "Clean site, easy to browse, fair prices. Got my order in two days. The item was exactly as described, really solid experience start to finish.",
   },
 ];
 
@@ -90,7 +90,7 @@ export default function Reviews() {
           </div>
         </div>
 
-        {/* Cards — horizontal scroll on mobile, grid on desktop */}
+        {/* Cards: horizontal scroll on mobile, grid on desktop */}
         <div className="hidden md:grid grid-cols-3 lg:grid-cols-5 gap-px bg-white">
           {visible.map((review) => (
             <div key={review.id} className="flex flex-col gap-3 bg-white p-5">

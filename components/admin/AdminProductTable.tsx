@@ -54,7 +54,7 @@ export default function AdminProductTable({
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       setStatusMap((prev) => ({ ...prev, [id]: products.find((p) => p.id === id)?.status ?? "DRAFT" }));
-      showError(err.error ?? "Failed to archive — are you still signed in?");
+      showError(err.error ?? "Failed to archive. Are you still signed in?");
     }
     router.refresh();
   }
@@ -72,7 +72,7 @@ export default function AdminProductTable({
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
       setStatusMap((prev) => ({ ...prev, [id]: previous }));
-      showError(err.error ?? "Failed to update status — are you still signed in?");
+      showError(err.error ?? "Failed to update status. Are you still signed in?");
       return;
     }
     // Commit confirmed value

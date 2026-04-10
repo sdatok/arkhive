@@ -64,7 +64,7 @@ export default function ImageUploader({
           const msg =
             data.error ??
             (res.status === 401
-              ? "Session expired — sign in again"
+              ? "Session expired, sign in again"
               : `Upload failed (${res.status})`);
           setUploadError(msg);
         }
@@ -141,7 +141,7 @@ export default function ImageUploader({
               Drop images here or click to upload
             </p>
             <p className="text-[11px] text-neutral-400 mt-1">
-              JPG, PNG, WEBP — multiple files supported
+              JPG, PNG, WEBP, multiple files supported
             </p>
           </>
         )}

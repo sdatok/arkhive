@@ -23,7 +23,8 @@ export default async function AdminWtfPage() {
             WTF
           </a>{" "}
           page. Order below is for your reference; the live page shuffles on every visit.
-          Star favourites — they stay random but tend to appear near the top.
+          Star favourites: they get a light bias upward but stay mixed in so the wall doesn&apos;t
+          look like a block of stars on top.
         </p>
       </div>
 

@@ -6,7 +6,7 @@ interface RelatedProductsStripProps {
 }
 
 /**
- * PDP “You may also like” — inset, compact cards. Catalog uses ProductGrid (5 col) only.
+ * PDP “You may also like”: inset, compact cards. Catalog uses ProductGrid (5 col) only.
  */
 export default function RelatedProductsStrip({
   products,

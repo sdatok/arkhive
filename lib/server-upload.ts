@@ -25,7 +25,7 @@ export type SaveUploadResult =
 
 /**
  * Saves an image to Vercel Blob when BLOB_READ_WRITE_TOKEN is set,
- * otherwise to public/{folder}/ (local dev only — Vercel FS is read-only).
+ * otherwise to public/{folder}/ (local dev only; Vercel FS is read-only).
  *
  * Private Blob stores: set BLOB_PUT_ACCESS=private. URLs point at /api/media/blob/...
  * so the storefront can load images without exposing the raw blob URL.

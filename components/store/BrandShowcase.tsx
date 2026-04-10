@@ -12,7 +12,7 @@ export default async function BrandShowcase() {
     });
     inventoryBrands = rows.map((r) => r.brand);
   } catch {
-    // Prisma unavailable — fall back to curated list only
+    // Prisma unavailable: fall back to curated list only
   }
 
   const brands = brandsForShowcase(inventoryBrands);

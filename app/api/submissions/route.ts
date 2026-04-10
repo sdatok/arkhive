@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
 
-// Public — anyone can submit an item
+// Public: anyone can submit an item
 export async function POST(request: Request) {
   try {
     const body = await request.json();
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
   }
 }
 
-// Admin only — list all submissions
+// Admin only: list all submissions
 export async function GET(request: Request) {
   const isAdmin = await getAdminSession();
   if (!isAdmin) {

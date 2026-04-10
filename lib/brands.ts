@@ -1,4 +1,4 @@
-/** Canonical brand list — used in BrandShowcase and admin ProductForm */
+/** Canonical brand list: used in BrandShowcase and admin ProductForm */
 export const KNOWN_BRANDS = [
   "Acne Studios",
   "Arc'teryx",

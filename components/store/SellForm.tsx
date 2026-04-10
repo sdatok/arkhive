@@ -276,7 +276,7 @@ export default function SellForm() {
                 Drop photos here or click to upload
               </p>
               <p className="text-[11px] text-neutral-400 mt-1">
-                Front, back, tags, any flaws — the more the better
+                Front, back, tags, any flaws; the more the better
               </p>
             </>
           )}

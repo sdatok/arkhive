@@ -3,7 +3,7 @@ import { saveUploadedImage } from "@/lib/server-upload";
 
 export const runtime = "nodejs";
 
-// Public upload endpoint — used by the /sell form (no auth required)
+// Public upload endpoint, used by the /sell form (no auth required)
 export async function POST(request: Request) {
   let formData: FormData;
   try {

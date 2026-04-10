@@ -1,5 +1,5 @@
 /**
- * Seed script — inserts initial Vale Forever products.
+ * Seed script: inserts initial Vale Forever products.
  * Run with: npm run seed
  *
  * Images are served from /public/products/ as static files.

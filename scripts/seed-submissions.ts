@@ -45,7 +45,7 @@ const submissions = [
     condition: "Good",
     imageUrls: [],
     status: "REVIEWING" as const,
-    adminNotes: "Checked StockX — current avg $340. Could offer $280 buy or list at $380 consign.",
+    adminNotes: "Checked StockX, current avg $340. Could offer $280 buy or list at $380 consign.",
   },
   {
     name: "Jordan Webb",
@@ -53,7 +53,7 @@ const submissions = [
     phone: "778-555-0234",
     itemName: "Stone Island Shadow Project Hooded Jacket",
     brand: "Stone Island",
-    description: "SS20 Stone Island Shadow Project, size XL. The one with the articulated sleeve. Paid $1100 USD. A small mark on the inner lining not visible when worn — priced accordingly. No badge issues.",
+    description: "SS20 Stone Island Shadow Project, size XL. The one with the articulated sleeve. Paid $1100 USD. A small mark on the inner lining not visible when worn, priced accordingly. No badge issues.",
     askingPrice: 550,
     condition: "Good",
     imageUrls: [],
@@ -71,7 +71,7 @@ const submissions = [
     condition: "Like new",
     imageUrls: [],
     status: "DECLINED" as const,
-    adminNotes: "Too common — FOG Essentials move slow. Passed.",
+    adminNotes: "Too common; FOG Essentials move slow. Passed.",
   },
   {
     name: "Ethan Kowalski",
@@ -97,12 +97,12 @@ async function main() {
     });
 
     if (existing) {
-      console.log(`  ⚠  Skipped (exists): ${sub.name} — ${sub.itemName}`);
+      console.log(`  ⚠  Skipped (exists): ${sub.name} · ${sub.itemName}`);
       continue;
     }
 
     await prisma.submission.create({ data: sub });
-    console.log(`  ✓  Created: ${sub.name} — ${sub.itemName} (${sub.status})`);
+    console.log(`  ✓  Created: ${sub.name} · ${sub.itemName} (${sub.status})`);
   }
 
   await prisma.$disconnect();

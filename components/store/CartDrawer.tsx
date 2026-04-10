@@ -131,7 +131,7 @@ export default function CartDrawer() {
               disabled
               className="w-full bg-black text-white text-[11px] uppercase tracking-widest py-3.5 hover:bg-neutral-800 transition-colors disabled:bg-neutral-300 disabled:cursor-not-allowed"
             >
-              Checkout — Coming Soon
+              Checkout, coming soon
             </button>
             <p className="text-[10px] text-neutral-400 text-center mt-3">
               Payment integration coming soon

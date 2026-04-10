@@ -446,7 +446,7 @@ export default function ProductForm({
                       min="0"
                       value={sizePricing[size] ?? ""}
                       onChange={(e) => setSizePrice(size, e.target.value)}
-                      placeholder={form.price || "—"}
+                      placeholder={form.price || "-"}
                       className="w-full border border-neutral-300 pl-6 pr-3 py-2 text-[13px] focus:outline-none focus:border-black transition-colors"
                     />
                   </div>

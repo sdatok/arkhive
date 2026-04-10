@@ -52,7 +52,7 @@ a {
   text-decoration: none;
 }
 
-/* Outline button that inverts on hover — used on Shop Now etc. */
+/* Outline button that inverts on hover; used on Shop Now etc. */
 .btn-invert {
   color: black;
   background: transparent;

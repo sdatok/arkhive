@@ -20,7 +20,7 @@ const FAQ_ITEMS: FaqItem[] = [
     question: "How do you verify authenticity?",
     paragraphs: [
       "Every piece we sell is reviewed for authenticity before it is listed. We work with established suppliers and consignors, inspect construction, materials, labels, and provenance where applicable, and only list items we are confident are genuine.",
-      "If you receive an item that you believe is not authentic, contact us within seven days of delivery with clear photos and details. After review, if we confirm the item is inauthentic, we will issue a full refund of the purchase price — no exceptions.",
+      "If you receive an item that you believe is not authentic, contact us within seven days of delivery with clear photos and details. After review, if we confirm the item is inauthentic, we will issue a full refund of the purchase price, with no exceptions.",
     ],
   },
   {

@@ -1,5 +1,5 @@
 /**
- * StockX Product Scraper — Local utility only, never deployed.
+ * StockX Product Scraper: local utility only, never deployed.
  *
  * Usage:
  *   npx tsx scripts/scrape-stockx.ts \
@@ -135,7 +135,7 @@ async function scrapeStockX(url: string): Promise<{
       .textContent()
       .catch(() => "");
 
-    // Extract images — StockX puts product images in various containers
+    // Extract images: StockX puts product images in various containers
     const imageUrls = await page.evaluate(() => {
       const images = new Set<string>();
 
@@ -202,7 +202,7 @@ async function main() {
   const sizesArg = args.sizes ? args.sizes.split(",").map((s) => s.trim()) : [];
   const category = args.category ?? "Accessories";
 
-  console.log(`\n=== Silk Archive — StockX Scraper ===`);
+  console.log(`\n=== Silk Archive · StockX Scraper ===`);
 
   const scraped = await scrapeStockX(url);
 

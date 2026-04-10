@@ -12,7 +12,7 @@ import type { Product } from "@/types";
 /** Homepage New Arrivals: max 3 rows at lg (5 columns). */
 const NEW_ARRIVALS_GRID_MAX = 15;
 
-/** Fisher–Yates shuffle — new array, original order unchanged */
+/** Fisher–Yates shuffle: new array, original order unchanged */
 function shuffleArray<T>(items: T[]): T[] {
   const a = [...items];
   for (let i = a.length - 1; i > 0; i--) {
@@ -63,13 +63,13 @@ export default async function HomePage() {
     <div>
       <HeroSection />
 
-      {/* Sliced product preview — random order each visit; grid below stays newest-first */}
+      {/* Sliced product preview: random order each visit; grid below stays newest-first */}
       {sliceProducts.length > 0 && <SlicedPreview products={sliceProducts} />}
 
       {/* Shop by Brand */}
       <BrandShowcase />
 
-      {/* New Arrivals grid — capped so FAQ / reviews are easier to reach */}
+      {/* New Arrivals grid: capped so FAQ / reviews are easier to reach */}
       {featured.length > 0 && (
         <section className="mt-0">
           <div className="max-w-[1400px] mx-auto px-4 py-8 flex items-center justify-between">

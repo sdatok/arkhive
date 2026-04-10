@@ -57,7 +57,7 @@ export default function WtfImageManager({
           setUploadError(
             upData.error ??
               (up.status === 401
-                ? "Session expired — sign in again"
+                ? "Session expired, sign in again"
                 : `Upload failed (${up.status})`)
           );
           continue;
@@ -186,7 +186,7 @@ export default function WtfImageManager({
           <>
             <p className="text-[13px] font-medium">Drop photos here or click to upload</p>
             <p className="text-[11px] text-neutral-400 mt-1">
-              JPG, PNG, WEBP — multiple files supported
+              JPG, PNG, WEBP, multiple files supported
             </p>
           </>
         )}
@@ -226,7 +226,7 @@ export default function WtfImageManager({
                     }`}
                     aria-pressed={img.featured}
                     aria-label={
-                      img.featured ? "Remove favourite" : "Favourite — show near top on site"
+                      img.featured ? "Remove favourite" : "Favourite, slight boost in the mix"
                     }
                   >
                     {img.featured ? "★" : "☆"}
@@ -321,10 +321,10 @@ export default function WtfImageManager({
                       ? "border-amber-400 bg-amber-100 text-amber-900"
                       : "border-neutral-200/90 bg-white/95 text-neutral-500 hover:border-neutral-400 hover:text-neutral-900"
                   }`}
-                  title={img.featured ? "Remove from favourites" : "Favourite (shuffle near top)"}
+                  title={img.featured ? "Remove from favourites" : "Favourite (slight boost, still mixed in)"}
                   aria-pressed={img.featured}
                   aria-label={
-                    img.featured ? "Remove favourite" : "Favourite — show near top on site"
+                    img.featured ? "Remove favourite" : "Favourite, slight boost in the mix"
                   }
                 >
                   {img.featured ? "★" : "☆"}

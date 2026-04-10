@@ -7,3 +7,21 @@ export function shuffle<T>(items: readonly T[], rng: () => number = Math.random)
   }
   return arr;
 }
+
+/**
+ * Order items by random key + optional bias for `featured`.
+ * Favourites trend higher on average but stay mixed in with the rest (no “all stars on top” block).
+ */
+export function sortWithFeaturedBias<T extends { featured: boolean }>(
+  items: readonly T[],
+  rng: () => number = Math.random,
+  featuredBias = 0.32
+): T[] {
+  return [...items]
+    .map((item) => ({
+      item,
+      key: rng() + (item.featured ? featuredBias : 0),
+    }))
+    .sort((a, b) => b.key - a.key)
+    .map(({ item }) => item);
+}

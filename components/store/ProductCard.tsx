@@ -63,7 +63,7 @@ export default function ProductCard({ product, compact }: ProductCardProps) {
         )}
       </div>
 
-      {/* Info — visible on hover on desktop, always on mobile */}
+      {/* Info: visible on hover on desktop, always on mobile */}
       <div
         className={
           compact

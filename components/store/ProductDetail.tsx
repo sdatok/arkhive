@@ -68,9 +68,9 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   return (
     <div className="max-w-[1400px] mx-auto px-4 py-8 md:py-12 pb-12 md:pb-16 bg-white">
-      {/* Desktop: fixed-ish two columns, centered — keeps buy box from stretching edge-to-edge */}
+      {/* Desktop: fixed-ish two columns, centered; keeps buy box from stretching edge-to-edge */}
       <div className="grid grid-cols-1 md:grid-cols-[minmax(0,480px)_minmax(0,340px)] md:max-w-[960px] lg:max-w-[1000px] md:mx-auto gap-8 lg:gap-12 items-start">
-        {/* Images — wider slot + contain so wide shots aren’t cropped at the sides */}
+        {/* Images: wider slot + contain so wide shots aren’t cropped at the sides */}
         <div className="flex gap-3 w-full max-w-[min(100%,460px)] md:max-w-[480px] mx-auto md:mx-0">
           {/* Thumbnails */}
           {sortedImages.length > 1 && (
@@ -130,7 +130,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           </div>
         </div>
 
-        {/* Product info — narrow column on desktop so CTA isn’t ultra-wide */}
+        {/* Product info: narrow column on desktop so CTA isn’t ultra-wide */}
         <div className="flex flex-col w-full max-w-[400px] md:max-w-none mx-auto md:mx-0">
           <p className="text-[11px] uppercase tracking-widest text-neutral-400">
             {product.brand}
@@ -237,7 +237,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
         </div>
       </div>
 
-      {/* Lightbox — backdrop receives outside taps; controls sit above image layer (full-bleed image div used to block Close on mobile) */}
+      {/* Lightbox: backdrop receives outside taps; controls sit above image layer (full-bleed image div used to block Close on mobile) */}
       {lightboxOpen && sortedImages[selectedImage] && (
         <div className="fixed inset-0 z-[100]" role="dialog" aria-modal="true" aria-label="Product image">
           <div

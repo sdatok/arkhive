@@ -137,7 +137,7 @@ export default function SubmissionsTable({
                   {sub.askingPrice != null && ` · $${sub.askingPrice.toFixed(2)}`}
                 </p>
                 <p className="text-[11px] text-neutral-500 mt-0.5">
-                  {sub.name} — {sub.email}
+                  {sub.name} · {sub.email}
                   {sub.phone && ` · ${sub.phone}`}
                 </p>
               </div>

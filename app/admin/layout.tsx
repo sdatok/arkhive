@@ -2,7 +2,7 @@ import Link from "next/link";
 import AdminLogout from "@/components/admin/AdminLogout";
 
 export const metadata = {
-  title: "Admin — ARKHIVE",
+  title: "Admin - ARKHIVE",
 };
 
 export default function AdminLayout({
