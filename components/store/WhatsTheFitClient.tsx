@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useWtfTheme } from "@/context/WtfThemeContext";
 
 export type WtfImagePublic = { id: string; url: string };
+
+const SWEEP_MS = 750;
 
 export default function WhatsTheFitClient({
   images,
@@ -15,26 +17,38 @@ export default function WhatsTheFitClient({
   const [sweepIn, setSweepIn] = useState(false);
   const completedRef = useRef(false);
 
+  const finishEntrance = useCallback(() => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setCurtainGone(true);
+    completeWtfEntrance();
+  }, [completeWtfEntrance]);
+
   useEffect(() => {
     if (
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches
     ) {
-      setCurtainGone(true);
-      completeWtfEntrance();
+      finishEntrance();
       return;
     }
     const id = requestAnimationFrame(() => {
       requestAnimationFrame(() => setSweepIn(true));
     });
     return () => cancelAnimationFrame(id);
-  }, [completeWtfEntrance]);
+  }, [finishEntrance]);
+
+  // transitionend is unreliable (Safari, compositor, zero-duration edge cases). Always clear the curtain.
+  useEffect(() => {
+    if (!sweepIn || curtainGone) return;
+    const t = window.setTimeout(finishEntrance, SWEEP_MS + 120);
+    return () => window.clearTimeout(t);
+  }, [sweepIn, curtainGone, finishEntrance]);
 
   function handleTransitionEnd(e: React.TransitionEvent<HTMLDivElement>) {
-    if (e.propertyName !== "transform" || completedRef.current) return;
-    completedRef.current = true;
-    setCurtainGone(true);
-    completeWtfEntrance();
+    const p = e.propertyName.toLowerCase();
+    if (!p.includes("transform")) return;
+    finishEntrance();
   }
 
   return (
@@ -42,7 +56,8 @@ export default function WhatsTheFitClient({
       {!curtainGone && (
         <div
           aria-hidden
-          className={`pointer-events-none fixed inset-0 z-[100] bg-black transition-transform duration-[750ms] ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
+          style={{ transitionDuration: `${SWEEP_MS}ms` }}
+          className={`pointer-events-none fixed inset-0 z-[100] bg-black transition-transform ease-[cubic-bezier(0.22,1,0.36,1)] will-change-transform ${
             sweepIn ? "translate-x-0" : "-translate-x-full"
           }`}
           onTransitionEnd={handleTransitionEnd}
