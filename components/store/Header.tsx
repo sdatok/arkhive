@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import CartDrawer from "./CartDrawer";
 import { useState } from "react";
-import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
+import { UserButton, useAuth } from "@clerk/nextjs";
 
 export default function Header() {
   const { itemCount, toggleCart } = useCart();
@@ -52,14 +52,12 @@ export default function Header() {
 
           <div className="flex items-center gap-5 md:gap-6">
             {!isSignedIn ? (
-              <SignInButton mode="modal">
-                <button
-                  type="button"
-                  className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
-                >
-                  Sign in
-                </button>
-              </SignInButton>
+              <Link
+                href="/sign-in"
+                className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
+              >
+                Sign in
+              </Link>
             ) : (
               <UserButton
                 appearance={{
@@ -106,6 +104,26 @@ export default function Header() {
               >
                 Sell
               </Link>
+              {!isSignedIn ? (
+                <Link
+                  href="/sign-in"
+                  className="text-[11px] uppercase tracking-widest font-medium"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Sign in
+                </Link>
+              ) : (
+                <div className="pt-2 border-t border-neutral-100 mt-2 flex items-center gap-2">
+                  <span className="text-[10px] uppercase tracking-widest text-neutral-400">
+                    Account
+                  </span>
+                  <UserButton
+                    appearance={{
+                      elements: { avatarBox: "h-7 w-7" },
+                    }}
+                  />
+                </div>
+              )}
             </nav>
           </div>
         )}
