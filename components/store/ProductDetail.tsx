@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useCart } from "@/context/CartContext";
 import type { Product } from "@/types";
+import { ONE_SIZE } from "@/lib/size-stock";
 
 interface ProductDetailProps {
   product: Product;
@@ -16,10 +17,16 @@ export default function ProductDetail({ product }: ProductDetailProps) {
 
   const [selectedImage, setSelectedImage] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const catalogSizes =
+    product.sizes.length > 0 ? product.sizes : [ONE_SIZE];
   const [selectedSize, setSelectedSize] = useState<string>("");
   const [sizeError, setSizeError] = useState(false);
   const [added, setAdded] = useState(false);
   const { addItem } = useCart();
+
+  function stockForSize(size: string): number {
+    return product.sizeStocks[size] ?? 0;
+  }
 
   useEffect(() => {
     if (!lightboxOpen) return;
@@ -42,14 +49,17 @@ export default function ProductDetail({ product }: ProductDetailProps) {
   }, [lightboxOpen]);
 
   function handleAddToCart() {
-    if (!selectedSize) {
+    const size = product.sizes.length > 0 ? selectedSize : ONE_SIZE;
+    if (product.sizes.length > 0 && !selectedSize) {
       setSizeError(true);
       return;
     }
     setSizeError(false);
+    if (stockForSize(size) < 1) return;
+
     const effectivePrice =
-      product.sizePricing && selectedSize && product.sizePricing[selectedSize] != null
-        ? Number(product.sizePricing[selectedSize])
+      product.sizePricing && size && product.sizePricing[size] != null
+        ? Number(product.sizePricing[size])
         : product.price;
 
     addItem({
@@ -58,7 +68,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
       name: product.name,
       brand: product.brand,
       price: effectivePrice,
-      size: selectedSize,
+      size,
       imageUrl: sortedImages[0]?.url ?? "",
       quantity: 1,
     });
@@ -164,7 +174,7 @@ export default function ProductDetail({ product }: ProductDetailProps) {
             )}
           </p>
 
-          {/* Sizes */}
+          {/* Sizes (hidden UI when single OS / no size list) */}
           {product.sizes.length > 0 && (
             <div className="mt-8">
               <div className="flex items-center justify-between mb-3">
@@ -178,22 +188,35 @@ export default function ProductDetail({ product }: ProductDetailProps) {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((size) => (
-                  <button
-                    key={size}
-                    onClick={() => {
-                      setSelectedSize(size);
-                      setSizeError(false);
-                    }}
-                    className={`px-4 py-2.5 text-[11px] uppercase tracking-widest border transition-colors ${
-                      selectedSize === size
-                        ? "bg-black text-white border-black"
-                        : "border-neutral-300 hover:border-black"
-                    }`}
-                  >
-                    {size}
-                  </button>
-                ))}
+                {catalogSizes.map((size) => {
+                  const stock = stockForSize(size);
+                  const disabled = stock < 1 || product.status === "SOLD";
+                  return (
+                    <button
+                      key={size}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => {
+                        setSelectedSize(size);
+                        setSizeError(false);
+                      }}
+                      className={`px-4 py-2.5 text-[11px] uppercase tracking-widest border transition-colors ${
+                        selectedSize === size
+                          ? "bg-black text-white border-black"
+                          : disabled
+                            ? "border-neutral-200 text-neutral-300 cursor-not-allowed"
+                            : "border-neutral-300 hover:border-black"
+                      }`}
+                    >
+                      {size}
+                      {stock > 0 && stock <= 5 && (
+                        <span className="block text-[9px] font-normal normal-case tracking-normal text-neutral-400 mt-0.5">
+                          {stock} left
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
           )}
@@ -201,20 +224,34 @@ export default function ProductDetail({ product }: ProductDetailProps) {
           {/* Add to cart */}
           <button
             onClick={handleAddToCart}
-            disabled={product.status === "SOLD"}
+            disabled={
+              product.status === "SOLD" ||
+              (product.sizes.length > 0 &&
+                selectedSize &&
+                stockForSize(selectedSize) < 1) ||
+              (product.sizes.length === 0 && stockForSize(ONE_SIZE) < 1)
+            }
             className={`mt-6 w-full py-4 text-[11px] uppercase tracking-widest font-medium transition-colors ${
-              product.status === "SOLD"
+              product.status === "SOLD" ||
+              (product.sizes.length > 0 &&
+                selectedSize &&
+                stockForSize(selectedSize) < 1) ||
+              (product.sizes.length === 0 && stockForSize(ONE_SIZE) < 1)
                 ? "bg-neutral-200 text-neutral-400 cursor-not-allowed"
                 : added
-                ? "bg-neutral-800 text-white"
-                : "bg-black text-white hover:bg-neutral-800"
+                  ? "bg-neutral-800 text-white"
+                  : "bg-black text-white hover:bg-neutral-800"
             }`}
           >
-            {product.status === "SOLD"
+            {product.status === "SOLD" ||
+            (product.sizes.length > 0 &&
+              selectedSize &&
+              stockForSize(selectedSize) < 1) ||
+            (product.sizes.length === 0 && stockForSize(ONE_SIZE) < 1)
               ? "Sold Out"
               : added
-              ? "Added to Cart"
-              : "Add to Cart"}
+                ? "Added to Cart"
+                : "Add to Cart"}
           </button>
 
           {/* Description */}

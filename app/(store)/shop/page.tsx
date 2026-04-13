@@ -3,6 +3,7 @@ import ProductGrid from "@/components/store/ProductGrid";
 import ShopFilters from "@/components/store/ShopFilters";
 import type { Product } from "@/types";
 import { CATEGORIES } from "@/types";
+import { toStoreProduct } from "@/lib/map-product";
 
 interface ShopPageProps {
   searchParams: Promise<{
@@ -35,7 +36,10 @@ async function getProducts(filters: {
     const [products, allBrands] = await Promise.all([
       prisma.product.findMany({
         where,
-        include: { images: { orderBy: { displayOrder: "asc" } } },
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          sizeStocks: true,
+        },
         orderBy,
       }),
       prisma.product.findMany({
@@ -47,14 +51,7 @@ async function getProducts(filters: {
     ]);
 
     return {
-      products: products.map((p) => ({
-        ...p,
-        price: Number(p.price),
-        sizePricing: p.sizePricing as Record<string, number> | null,
-        consignment: Boolean(p.consignment),
-        createdAt: p.createdAt.toISOString(),
-        updatedAt: p.updatedAt.toISOString(),
-      })),
+      products: products.map((p) => toStoreProduct(p)),
       brands: allBrands.map((b) => b.brand),
     };
   } catch (err) {

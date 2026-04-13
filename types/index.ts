@@ -23,7 +23,10 @@ export interface Product {
   status: ProductStatus;
   sizes: string[];
   sizePricing: Record<string, number> | null;
+  /** Sum of per-size stock (legacy field; use sizeStocks for UI) */
   quantity: number;
+  /** Quantity available per size label */
+  sizeStocks: Record<string, number>;
   /** Curated resale: shown on PDP with condition copy when true */
   consignment: boolean;
   images: ProductImage[];

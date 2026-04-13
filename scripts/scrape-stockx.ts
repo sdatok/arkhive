@@ -17,6 +17,7 @@
 import { chromium } from "playwright";
 import { PrismaClient } from "@prisma/client";
 import { put } from "@vercel/blob";
+import { ONE_SIZE } from "../lib/size-stock";
 import * as fs from "fs";
 import * as path from "path";
 import * as https from "https";
@@ -241,6 +242,9 @@ async function main() {
 
   // Insert into database
   console.log(`\nInserting into database...`);
+  const catalogSizes = sizesArg.length > 0 ? sizesArg : [];
+  const stockSizes = catalogSizes.length > 0 ? catalogSizes : [ONE_SIZE];
+
   const product = await prisma.product.create({
     data: {
       name,
@@ -250,12 +254,16 @@ async function main() {
       price: priceArg,
       category,
       status: "DRAFT",
-      sizes: sizesArg,
+      sizes: catalogSizes,
+      quantity: stockSizes.length,
       images: {
         create: uploadedUrls.map((url, idx) => ({
           url,
           displayOrder: idx,
         })),
+      },
+      sizeStocks: {
+        create: stockSizes.map((size) => ({ size, quantity: 1 })),
       },
     },
     include: { images: true },

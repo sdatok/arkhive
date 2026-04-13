@@ -42,6 +42,24 @@ export default function AdminLayout({
                 WTF
               </Link>
               <Link
+                href="/admin/orders"
+                className="text-[10px] uppercase tracking-widest text-neutral-400 hover:text-white transition-colors"
+              >
+                Orders
+              </Link>
+              <Link
+                href="/admin/promos"
+                className="text-[10px] uppercase tracking-widest text-neutral-400 hover:text-white transition-colors"
+              >
+                Promos
+              </Link>
+              <Link
+                href="/admin/stats"
+                className="text-[10px] uppercase tracking-widest text-neutral-400 hover:text-white transition-colors"
+              >
+                Stats
+              </Link>
+              <Link
                 href="/"
                 target="_blank"
                 className="text-[10px] uppercase tracking-widest text-neutral-400 hover:text-white transition-colors"

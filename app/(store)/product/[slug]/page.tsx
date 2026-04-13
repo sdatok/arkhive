@@ -4,6 +4,7 @@ import ProductDetail from "@/components/store/ProductDetail";
 import RelatedProductsStrip from "@/components/store/RelatedProductsStrip";
 import type { Product } from "@/types";
 import type { Metadata } from "next";
+import { toStoreProduct } from "@/lib/map-product";
 
 interface ProductPageProps {
   params: Promise<{ slug: string }>;
@@ -13,17 +14,13 @@ async function getProduct(slug: string): Promise<Product | null> {
   try {
     const product = await prisma.product.findUnique({
       where: { slug },
-      include: { images: { orderBy: { displayOrder: "asc" } } },
+      include: {
+        images: { orderBy: { displayOrder: "asc" } },
+        sizeStocks: true,
+      },
     });
     if (!product) return null;
-    return {
-      ...product,
-      price: Number(product.price),
-      sizePricing: product.sizePricing as Record<string, number> | null,
-      consignment: Boolean(product.consignment),
-      createdAt: product.createdAt.toISOString(),
-      updatedAt: product.updatedAt.toISOString(),
-    };
+    return toStoreProduct(product);
   } catch (err) {
     console.error("[getProduct]", err);
     return null;
@@ -37,18 +34,14 @@ async function getRelated(
   try {
     const products = await prisma.product.findMany({
       where: { status: "ACTIVE", category, id: { not: excludeId } },
-      include: { images: { orderBy: { displayOrder: "asc" } } },
+      include: {
+        images: { orderBy: { displayOrder: "asc" } },
+        sizeStocks: true,
+      },
       take: 4,
       orderBy: { createdAt: "desc" },
     });
-    return products.map((p) => ({
-      ...p,
-      price: Number(p.price),
-      sizePricing: p.sizePricing as Record<string, number> | null,
-      consignment: Boolean(p.consignment),
-      createdAt: p.createdAt.toISOString(),
-      updatedAt: p.updatedAt.toISOString(),
-    }));
+    return products.map((p) => toStoreProduct(p));
   } catch (err) {
     console.error("[getRelated]", err);
     return [];

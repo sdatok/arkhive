@@ -95,7 +95,14 @@ async function main() {
         category: product.category,
         status: product.status,
         sizes: product.sizes,
+        quantity: product.sizes.length,
         images: { create: product.images },
+        sizeStocks: {
+          create: product.sizes.map((size) => ({
+            size,
+            quantity: 1,
+          })),
+        },
       },
     });
 

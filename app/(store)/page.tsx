@@ -8,6 +8,7 @@ import StoreFaq from "@/components/store/StoreFaq";
 import HeroSection from "@/components/store/HeroSection";
 import BrandShowcase from "@/components/store/BrandShowcase";
 import type { Product } from "@/types";
+import { toStoreProduct } from "@/lib/map-product";
 
 /** Homepage New Arrivals: max 3 rows at lg (5 columns). */
 const NEW_ARRIVALS_GRID_MAX = 15;
@@ -30,20 +31,16 @@ async function getHomepageProducts(): Promise<{
     const [products, activeProductCount] = await Promise.all([
       prisma.product.findMany({
         where: { status: "ACTIVE" },
-        include: { images: { orderBy: { displayOrder: "asc" } } },
+        include: {
+          images: { orderBy: { displayOrder: "asc" } },
+          sizeStocks: true,
+        },
         orderBy: { createdAt: "desc" },
         take: 24,
       }),
       prisma.product.count({ where: { status: "ACTIVE" } }),
     ]);
-    const featured: Product[] = products.map((p) => ({
-      ...p,
-      price: Number(p.price),
-      sizePricing: p.sizePricing as Record<string, number> | null,
-      consignment: Boolean(p.consignment),
-      createdAt: p.createdAt.toISOString(),
-      updatedAt: p.updatedAt.toISOString(),
-    }));
+    const featured: Product[] = products.map((p) => toStoreProduct(p));
     return { featured, activeProductCount };
   } catch (err) {
     console.error("[getHomepageProducts]", err);

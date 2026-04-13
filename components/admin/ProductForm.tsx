@@ -6,6 +6,7 @@ import ImageUploader, { type UploadedImage } from "./ImageUploader";
 import { CATEGORIES } from "@/types";
 import type { Product } from "@/types";
 import { KNOWN_BRANDS } from "@/lib/brands";
+import { ONE_SIZE } from "@/lib/size-stock";
 
 const SIZE_PRESETS: Record<string, string[]> = {
   Clothing: ["XS", "S", "M", "L", "XL", "XXL"],
@@ -37,8 +38,8 @@ export default function ProductForm({
     price: product?.price?.toString() ?? "",
     category: product?.category ?? CATEGORIES[0],
     status: product?.status ?? "DRAFT",
-    sizes: product?.sizes ?? [] as string[],
-    quantity: product?.quantity?.toString() ?? "1",
+    sizes: product?.sizes ?? ([] as string[]),
+    quantity: product?.quantity?.toString() ?? "0",
     consignment: product?.consignment ?? false,
   });
 
@@ -58,6 +59,15 @@ export default function ProductForm({
   );
 
   const [customSize, setCustomSize] = useState("");
+
+  const [sizeQty, setSizeQty] = useState<Record<string, string>>(() => {
+    if (product?.sizeStocks && Object.keys(product.sizeStocks).length > 0) {
+      return Object.fromEntries(
+        Object.entries(product.sizeStocks).map(([k, v]) => [k, String(v)])
+      );
+    }
+    return { [ONE_SIZE]: "1" };
+  });
 
   // Brand combobox state
   const [brandInput, setBrandInput] = useState(product?.brand ?? "");
@@ -87,6 +97,16 @@ export default function ProductForm({
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
+
+  useEffect(() => {
+    setSizeQty((prev) => {
+      const next = { ...prev };
+      for (const s of form.sizes) {
+        if (next[s] === undefined) next[s] = "1";
+      }
+      return next;
+    });
+  }, [form.sizes]);
 
   function slugify(str: string) {
     return str
@@ -126,6 +146,10 @@ export default function ProductForm({
     setSizePricing((prev) => ({ ...prev, [size]: value }));
   }
 
+  function setSizeStockField(size: string, value: string) {
+    setSizeQty((prev) => ({ ...prev, [size]: value }));
+  }
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
@@ -137,13 +161,24 @@ export default function ProductForm({
       if (!isNaN(num) && num > 0) parsedSizePricing[size] = num;
     }
 
+    const sizeStocks: Record<string, number> = {};
+    if (form.sizes.length === 0) {
+      sizeStocks[ONE_SIZE] = Math.max(0, parseInt(sizeQty[ONE_SIZE] || "0", 10) || 0);
+    } else {
+      for (const s of form.sizes) {
+        sizeStocks[s] = Math.max(0, parseInt(sizeQty[s] || "0", 10) || 0);
+      }
+    }
+    const sumStock = Object.values(sizeStocks).reduce((a, b) => a + b, 0);
+
     const payload = {
       ...form,
       brand: brandInput.trim(),
       price: parseFloat(form.price),
-      quantity: parseInt(form.quantity, 10) || 1,
+      quantity: sumStock,
       sizePricing:
         Object.keys(parsedSizePricing).length > 0 ? parsedSizePricing : null,
+      sizeStocks,
       images,
     };
 
@@ -331,18 +366,6 @@ export default function ProductForm({
               <option value="SOLD">Sold Out</option>
             </select>
           </div>
-          <div>
-            <label className="block text-[10px] uppercase tracking-widest text-neutral-500 mb-2">
-              Quantity (internal)
-            </label>
-            <input
-              type="number"
-              min="0"
-              value={form.quantity}
-              onChange={(e) => update("quantity", e.target.value)}
-              className="w-full border border-neutral-300 px-3 py-2.5 text-[13px] focus:outline-none focus:border-black transition-colors"
-            />
-          </div>
         </div>
 
         <label className="flex items-start gap-3 cursor-pointer rounded border border-neutral-200 px-4 py-3.5 hover:border-neutral-300 transition-colors">
@@ -424,30 +447,66 @@ export default function ProductForm({
           </button>
         </div>
 
-        {/* Per-size price overrides */}
+        {/* One-size (OS) when no sizes selected */}
+        {form.sizes.length === 0 && (
+          <div className="mb-6">
+            <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-2">
+              Stock (single size — sold as one SKU)
+            </p>
+            <input
+              type="number"
+              min="0"
+              value={sizeQty[ONE_SIZE] ?? "0"}
+              onChange={(e) => setSizeStockField(ONE_SIZE, e.target.value)}
+              className="w-32 border border-neutral-300 px-3 py-2 text-[13px] focus:outline-none focus:border-black transition-colors"
+            />
+          </div>
+        )}
+
+        {/* Per-size price + stock */}
         {form.sizes.length > 0 && (
           <div>
             <p className="text-[10px] uppercase tracking-widest text-neutral-500 mb-3">
-              Per-size price (leave blank to use base price)
+              Per-size price (blank = base) and stock count
             </p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {form.sizes.map((size) => (
-                <div key={size}>
-                  <label className="block text-[10px] uppercase tracking-widest text-neutral-500 mb-1.5">
+                <div
+                  key={size}
+                  className="border border-neutral-100 rounded p-3 space-y-2"
+                >
+                  <p className="text-[11px] font-medium uppercase tracking-widest">
                     {size}
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-neutral-400">
-                      $
-                    </span>
+                  </p>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-widest text-neutral-400 mb-1">
+                      Price
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[12px] text-neutral-400">
+                        $
+                      </span>
+                      <input
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value={sizePricing[size] ?? ""}
+                        onChange={(e) => setSizePrice(size, e.target.value)}
+                        placeholder={form.price || "-"}
+                        className="w-full border border-neutral-300 pl-6 pr-3 py-2 text-[13px] focus:outline-none focus:border-black transition-colors"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[9px] uppercase tracking-widest text-neutral-400 mb-1">
+                      Stock
+                    </label>
                     <input
                       type="number"
-                      step="0.01"
                       min="0"
-                      value={sizePricing[size] ?? ""}
-                      onChange={(e) => setSizePrice(size, e.target.value)}
-                      placeholder={form.price || "-"}
-                      className="w-full border border-neutral-300 pl-6 pr-3 py-2 text-[13px] focus:outline-none focus:border-black transition-colors"
+                      value={sizeQty[size] ?? "0"}
+                      onChange={(e) => setSizeStockField(size, e.target.value)}
+                      className="w-full border border-neutral-300 px-3 py-2 text-[13px] focus:outline-none focus:border-black transition-colors"
                     />
                   </div>
                 </div>

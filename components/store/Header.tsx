@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useCart } from "@/context/CartContext";
 import CartDrawer from "./CartDrawer";
 import { useState } from "react";
+import { SignInButton, UserButton, useAuth } from "@clerk/nextjs";
 
 export default function Header() {
   const { itemCount, toggleCart } = useCart();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { isSignedIn } = useAuth();
 
   return (
     <>
@@ -48,8 +50,27 @@ export default function Header() {
             ARKHIVE
           </Link>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-5 md:gap-6">
+            {!isSignedIn ? (
+              <SignInButton mode="modal">
+                <button
+                  type="button"
+                  className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
+                >
+                  Sign in
+                </button>
+              </SignInButton>
+            ) : (
+              <UserButton
+                appearance={{
+                  elements: {
+                    avatarBox: "h-7 w-7",
+                  },
+                }}
+              />
+            )}
             <button
+              type="button"
               onClick={toggleCart}
               className="text-[11px] uppercase tracking-widest font-medium hover:text-neutral-500 transition-colors"
             >

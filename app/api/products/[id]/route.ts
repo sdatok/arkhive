@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { getAdminSession } from "@/lib/auth";
 import { revalidateProductPages } from "@/lib/revalidate-store";
+import {
+  replaceProductSizeStocks,
+  syncProductAggregateQuantity,
+  type SizeQuantityMap,
+} from "@/lib/size-stock";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +19,10 @@ export async function GET(_req: Request, { params }: RouteParams) {
   try {
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { images: { orderBy: { displayOrder: "asc" } } },
+      include: {
+        images: { orderBy: { displayOrder: "asc" } },
+        sizeStocks: true,
+      },
     });
     if (!product) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(product);
@@ -30,13 +38,29 @@ export async function PUT(request: Request, { params }: RouteParams) {
   const { id } = await params;
   try {
     const body = await request.json();
-    const { name, brand, slug, description, price, category, status, sizes, sizePricing, quantity, images, consignment } = body;
+    const {
+      name,
+      brand,
+      slug,
+      description,
+      price,
+      category,
+      status,
+      sizes,
+      sizePricing,
+      quantity,
+      images,
+      consignment,
+      sizeStocks,
+    } = body;
 
-    // Update product in a transaction: delete old images, create new ones
+    const sizeList: string[] = sizes ?? [];
+    const stockMap: SizeQuantityMap = sizeStocks ?? {};
+
     const product = await prisma.$transaction(async (tx) => {
       await tx.productImage.deleteMany({ where: { productId: id } });
 
-      return tx.product.update({
+      const p = await tx.product.update({
         where: { id },
         data: {
           name,
@@ -46,9 +70,9 @@ export async function PUT(request: Request, { params }: RouteParams) {
           price,
           category,
           status,
-          sizes,
+          sizes: sizeList,
           sizePricing: sizePricing ?? null,
-          quantity: quantity ?? 1,
+          quantity: quantity ?? 0,
           consignment: Boolean(consignment),
           images: {
             create: (images ?? []).map(
@@ -61,10 +85,19 @@ export async function PUT(request: Request, { params }: RouteParams) {
         },
         include: { images: true },
       });
+      await replaceProductSizeStocks(tx, id, sizeList, stockMap);
+      return p;
+    });
+
+    await syncProductAggregateQuantity(prisma, id);
+
+    const full = await prisma.product.findUnique({
+      where: { id },
+      include: { images: true, sizeStocks: true },
     });
 
     revalidateProductPages(product.slug);
-    return NextResponse.json(product);
+    return NextResponse.json(full);
   } catch (err: unknown) {
     console.error(err);
     const message = err instanceof Error ? err.message : "Failed to update";
@@ -79,7 +112,6 @@ export async function PATCH(request: Request, { params }: RouteParams) {
   const { id } = await params;
   try {
     const body = await request.json();
-    // Only allow patching explicit scalar fields to prevent accidental overwrites
     const allowed = ["status", "quantity", "price"] as const;
     const data: Record<string, unknown> = {};
     for (const key of allowed) {

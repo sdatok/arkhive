@@ -1,23 +1,20 @@
 import Link from "next/link";
 import { prisma } from "@/lib/db";
 import AdminProductTable from "@/components/admin/AdminProductTable";
+import { toStoreProduct } from "@/lib/map-product";
 
 export const dynamic = "force-dynamic";
 
 async function getAllProducts() {
   try {
     const products = await prisma.product.findMany({
-      include: { images: { orderBy: { displayOrder: "asc" }, take: 1 } },
+      include: {
+        images: { orderBy: { displayOrder: "asc" }, take: 1 },
+        sizeStocks: true,
+      },
       orderBy: { createdAt: "desc" },
     });
-    return products.map((p) => ({
-      ...p,
-      price: Number(p.price),
-      sizePricing: p.sizePricing as Record<string, number> | null,
-      consignment: Boolean(p.consignment),
-      createdAt: p.createdAt.toISOString(),
-      updatedAt: p.updatedAt.toISOString(),
-    }));
+    return products.map((p) => toStoreProduct(p));
   } catch (err) {
     console.error("[getAllProducts admin]", err);
     return [];

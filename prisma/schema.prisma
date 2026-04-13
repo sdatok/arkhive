@@ -9,24 +9,38 @@ datasource db {
 }
 
 model Product {
-  id          String         @id @default(cuid())
-  slug        String         @unique
+  id          String             @id @default(cuid())
+  slug        String             @unique
   name        String
   brand       String
-  description String         @db.Text
-  price       Decimal        @db.Decimal(10, 2)
+  description String             @db.Text
+  price       Decimal            @db.Decimal(10, 2)
   category    String
-  status      ProductStatus  @default(DRAFT)
+  status      ProductStatus      @default(DRAFT)
   sizes       String[]
   sizePricing Json?
-  quantity    Int            @default(1)
-  consignment Boolean        @default(false)
+  /// Legacy aggregate; sum of sizeStocks is authoritative for inventory
+  quantity    Int                @default(0)
+  consignment Boolean            @default(false)
   images      ProductImage[]
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
+  sizeStocks  ProductSizeStock[]
+  lineItems   OrderLineItem[]
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
 
   @@index([status])
   @@index([category])
+}
+
+model ProductSizeStock {
+  id        String  @id @default(cuid())
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  size      String
+  quantity  Int     @default(0)
+
+  @@unique([productId, size])
+  @@index([productId])
 }
 
 model ProductImage {
@@ -50,13 +64,68 @@ model WtfImage {
   @@index([featured])
 }
 
+model CustomerProfile {
+  clerkUserId         String   @id
+  email               String
+  welcomeDiscountUsed Boolean  @default(false)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([email])
+}
+
+model PromoCode {
+  id               String    @id @default(cuid())
+  code             String    @unique
+  type             PromoType
+  /// PERCENT: 0–100 whole order; FIXED: USD off order subtotal
+  value            Decimal     @db.Decimal(10, 2)
+  active           Boolean     @default(true)
+  expiresAt        DateTime?
+  maxRedemptions   Int?
+  perCustomerLimit Int?
+  minSubtotal      Decimal?    @db.Decimal(10, 2)
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  orders           Order[]
+}
+
 model Order {
-  id        String      @id @default(cuid())
-  status    OrderStatus @default(PENDING)
-  total     Decimal     @db.Decimal(10, 2)
-  email     String?
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  id                     String          @id @default(cuid())
+  status                 OrderStatus     @default(PENDING)
+  subtotal               Decimal         @db.Decimal(10, 2)
+  discountTotal          Decimal         @default(0) @db.Decimal(10, 2)
+  total                  Decimal         @db.Decimal(10, 2)
+  email                  String?
+  stripeSessionId        String?         @unique
+  stripePaymentIntentId  String?         @unique
+  clerkUserId            String?
+  welcomeDiscountApplied Boolean         @default(false)
+  promoCodeId            String?
+  promo                  PromoCode?      @relation(fields: [promoCodeId], references: [id], onDelete: SetNull)
+  lineItems              OrderLineItem[]
+  createdAt              DateTime        @default(now())
+  updatedAt              DateTime        @updatedAt
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([clerkUserId])
+}
+
+model OrderLineItem {
+  id        String  @id @default(cuid())
+  orderId   String
+  order     Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+  size      String
+  quantity  Int
+  unitPrice Decimal @db.Decimal(10, 2)
+  name      String
+  brand     String
+
+  @@index([orderId])
+  @@index([productId])
 }
 
 model Submission {
@@ -76,6 +145,11 @@ model Submission {
   updatedAt    DateTime         @updatedAt
 
   @@index([status])
+}
+
+enum PromoType {
+  PERCENT
+  FIXED
 }
 
 enum SubmissionStatus {
